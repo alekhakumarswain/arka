@@ -1,0 +1,100 @@
+public/
+├── .env
+├── 404.html
+├── assets/
+│   ├── css/
+│   │   ├── base/
+│   │   │   ├── reset.css
+│   │   │   ├── typography.css
+│   │   │   └── variables.css
+│   │   ├── components/
+│   │   │   ├── footer.css
+│   │   │   └── navbar.css
+│   │   ├── layouts/
+│   │   │   ├── flex.css
+│   │   │   └── grid.css
+│   │   ├── pages/
+│   │   │   ├── booking.css
+│   │   │   ├── bus-tracking.css
+│   │   │   ├── events.css
+│   │   │   ├── map.css
+│   │   │   ├── profile.css
+│   │   │   ├── tourism.css
+│   │   │   └── trekking.css
+│   │   ├── styles.css
+│   │   └── utilities/
+│   │       ├── spacing.css
+│   │       └── visibility.css
+│   ├── icons/
+│   ├── images/
+│   ├── js/
+│   │   ├── components/
+│   │   │   ├── alert.js
+│   │   │   ├── booking-card.js
+│   │   │   ├── map.js
+│   │   │   └── weather-widget.js
+│   │   ├── core/
+│   │   │   ├── app.js
+│   │   │   ├── config.js
+│   │   │   └── router.js
+│   │   ├── features/
+│   │   │   ├── culture/
+│   │   │   │   ├── events.js
+│   │   │   │   └── marketplace.js
+│   │   │   ├── tourism/
+│   │   │   │   ├── attractions.js
+│   │   │   │   └── virtual-tours.js
+│   │   │   ├── transport/
+│   │   │   │   ├── booking.js
+│   │   │   │   ├── routes.js
+│   │   │   │   └── tracking.js
+│   │   │   └── trekking/
+│   │   │       ├── trails.js
+│   │   │       └── weather.js
+│   │   ├── lib/
+│   │   │   ├── openlayers.js
+│   │   │   └── three.min.js
+│   │   ├── pages/
+│   │   │   ├── admin/
+│   │   │   │   ├── dashboard.js
+│   │   │   │   └── management.js
+│   │   │   ├── driver/
+│   │   │   │   ├── console.js
+│   │   │   │   └── scanner.js
+│   │   │   ├── organizer/
+│   │   │   │   ├── attendees.js
+│   │   │   │   └── events.js
+│   │   │   └── user/
+│   │   │       ├── dashboard.js
+│   │   │       ├── history.js
+│   │   │       └── profile.js
+│   │   ├── services/
+│   │   │   ├── auth.js
+│   │   │   ├── firestore.js
+│   │   │   ├── payment.js
+│   │   │   ├── realtime.js
+│   │   │   └── storage.js
+│   │   └── utils/
+│   │       ├── form-validators.js
+│   │       ├── helpers.js
+│   │       └── notifications.js
+│   └── models/
+│       ├── events/
+│       ├── temples/
+│       │   └── kedarnathtemple.obj
+│       ├── tourism/
+│       └── trekking/
+├── components/
+│   ├── footer.html
+│   └── navbar.html
+├── index.html
+├── manifest.json
+├── pages/
+│   ├── booking.html
+│   ├── bus-tracking.html
+│   ├── events.html
+│   ├── map.html
+│   ├── profile.html
+│   ├── tourism.html
+│   └── trekking.html
+└── service-worker.js

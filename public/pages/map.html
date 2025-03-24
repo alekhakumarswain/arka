@@ -156,7 +156,7 @@
 
     landmarks.forEach((landmark, index) => {
       objLoader.load(
-        '../assets/models/kedarnathtemple.obj', // Use absolute path
+        '../assets/models/temples/kedarnathtemple.obj', // Use absolute path
         (object) => {
           // Compute the bounding box to understand the model's size
           const box = new THREE.Box3().setFromObject(object);

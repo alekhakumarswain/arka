@@ -1,0 +1,336 @@
+Overview of the Two Databases
+arka (Static Data):
+Stored in Firebase Firestore (or similar NoSQL database).
+Contains persistent, infrequently changing data like user profiles, bus routes, bookings, and historical records.
+Used for planning, booking, and historical analysis.
+arka_realtime (Live Data):
+Stored in Firebase Realtime Database.
+Handles fast, dynamic updates like live bus locations, user positions, and trekker statuses.
+Optimized for real-time tracking and immediate user feedback.
+The two databases work together: static data provides the foundation (e.g., routes, schedules), while real-time data overlays live updates (e.g., bus ETA, trekker progress).
+
+Detailed Explanation of arka (Static Data)
+📂 users
+Purpose: Stores user profiles, preferences, and travel history.
+Fields:
+name, email, phone, address: Basic user info.
+saved_routes: Array of routeIds (e.g., routeId1) linking to routes for quick access to favorite routes.
+bookings: Array of bookingIds (e.g., bookingId1) linking to bookings for current/future trips.
+preferences: User settings (language, theme, notifications).
+travel_history: Array of past trips with bookingId, date, and destination, linking to bookings for details.
+total_spent: Cumulative spending, calculated from payments.
+join_date: Registration timestamp.
+Connections:
+saved_routes → routes: Links to specific routes the user prefers.
+bookings → bookings: References active or upcoming bookings.
+travel_history → bookings: Historical bookings provide trip details.
+total_spent → payments: Aggregates payment amounts for the user.
+📂 buses
+Purpose: Stores bus details, schedules, and historical performance.
+Fields:
+route: Descriptive name (e.g., "Bhubaneswar - Puri"), tied to routeId in routes.
+current_location: Last known lat/lng (updated periodically from live_buses).
+seats_available, total_seats: Seating capacity and availability.
+driver, conductor: Contact info for staff.
+live_status: Current status (e.g., "On Route"), synced with live_buses.
+trip_frequency: Number of daily trips (A_to_B, B_to_A).
+schedule: Array of trip timings (direction, departure, arrival).
+travel_history: Past trips with date, seats_booked, passengers (userIds), and revenue.
+total_revenue: Sum of revenue from travel_history.
+Connections:
+route → routes: Matches with a routeId for stop and pricing details.
+current_location, live_status → live_buses: Updated from real-time data.
+travel_history.passengers → users: Links to userIds who traveled.
+seats_available → bookings: Updated as bookings are made.
+📂 routes
+Purpose: Defines bus routes with stops, distances, and pricing.
+Fields:
+origin, destination: Start and end points.
+stops: Array of stop details (name, geolocation, arrival time for first trip).
+distance_km: Total route length.
+ticket_price: Cost per trip.
+history: Past trips with date, busId, and passengers.
+Connections:
+stops.geolocation → live_buses: Used to calculate next_stop and eta_next_stop.
+history.busId → buses: Links to the bus that operated the trip.
+history.passengers → users: Total passengers (aggregated from bookings).
+Referenced by buses.route and live_buses.routeId.
+📂 bookings
+Purpose: Tracks individual trip bookings.
+Fields:
+userId: Links to users.
+busId: Links to buses.
+seat_number: Assigned seat.
+payment_status: Paid or Pending.
+booking_date, travel_date: When booked and when traveling.
+amount: Ticket cost, tied to routes.ticket_price.
+tracking_id: Unique ID for boarding verification.
+Connections:
+userId → users: Associates booking with a user.
+busId → buses: Specifies the bus.
+amount → payments: Matches payment amount.
+tracking_id → live_buses: Verified when boarding to update passengers_onboard.
+📂 tourism_sites
+Purpose: Stores details of tourism attractions (temples, historical sites, natural spots).
+Fields:
+name, type: Site name and category (e.g., "Historical Temple").
+location: Lat/lng coordinates.
+history: Background info.
+images, 3D_model: Media assets.
+schedule: Open/close times and closed days.
+entry_fee: Cost of entry.
+visitor_count: Total visitors (historical).
+Connections:
+location → weather_live: Weather updates for the site.
+Used by AI scheduling (e.g., trekking or event planning).
+📂 trekking_routes
+Purpose: Defines trekking paths and schedules.
+Fields:
+name, district: Trek name and location.
+difficulty, distance_km, elevation_m: Trek characteristics.
+nearby_areas: Related locations for multi-day plans.
+schedule_plan: AI-generated itinerary (day, activity, stay).
+weather_advice: Best trekking conditions.
+trek_history: Past treks with date and trekkers (userIds).
+Connections:
+trek_history.trekkers → users: Links to users who trekked.
+schedule_plan → trek_live_status: Real-time tracking follows this plan.
+district, nearby_areas → tourism_sites: Suggests nearby attractions.
+📂 events
+Purpose: Stores event details and rules.
+Fields:
+name, date, time: Event specifics.
+location: Venue.
+ticket_price: Entry cost.
+rules: Regulations (e.g., "No littering").
+attendance_history: Past attendance data.
+organizer: Event host.
+Connections:
+location → tourism_sites: Ties to a site if applicable (e.g., Konark Sun Temple).
+Used by AI scheduling for trip planning.
+📂 payments
+Purpose: Tracks payment transactions.
+Fields:
+userId: Links to users.
+amount: Payment value.
+status: Completed or Pending.
+payment_date: Transaction timestamp.
+method: Payment type (e.g., UPI).
+bookingId: Links to bookings.
+transaction_id: Unique ID.
+Connections:
+userId → users: Associates payment with a user.
+bookingId → bookings: Ties payment to a specific trip.
+amount → users.total_spent: Contributes to cumulative spending.
+Detailed Explanation of arka_realtime (Live Data)
+📂 live_buses
+Purpose: Tracks buses in real-time.
+Fields:
+lat, lng, speed: Current position and speed.
+last_updated: Timestamp of last update.
+routeId: Links to routes.
+direction, trip_number: Current trip details.
+next_stop, eta_next_stop: Next stop and estimated arrival.
+passengers_onboard: Current passenger count.
+status: Real-time status (e.g., "On Route").
+alerts: Delay or issue notifications.
+Connections:
+routeId → routes: Provides stop and schedule context.
+busId → buses: Syncs with static bus data (e.g., seats_available).
+passengers_onboard → bookings: Updated via tracking_id scans.
+alerts → alerts: Mirrors delay notifications.
+eta_next_stop → routes.stops: Calculated using geolocation and speed.
+📂 user_locations
+Purpose: Tracks user positions in real-time.
+Fields:
+lat, lng, last_updated: Current location and timestamp.
+nearest_bus_stop: Closest stop from routes.stops.
+nearest_bus: Closest bus from live_buses.
+eta_to_stop: Estimated time to reach the stop.
+current_booking: Active bookingId.
+status: User state (e.g., "Waiting", "Onboard").
+Connections:
+nearest_bus_stop → routes.stops: Matches geolocation.
+nearest_bus → live_buses: Tracks proximity to buses.
+current_booking → bookings: Links to active trip.
+userId → users: Ties to user profile.
+📂 trek_live_status
+Purpose: Tracks trekkers in real-time.
+Fields:
+trekkerId: Links to users (e.g., userId3).
+lat, lng, altitude, speed: Current position and progress.
+last_checkin: Last update timestamp.
+next_checkpoint, eta_checkpoint: Next stop and ETA.
+status: Trek state (e.g., "Active").
+sos_alert: Emergency flag.
+Connections:
+trekId → trekking_routes: Provides trek details and schedule.
+trekkerId → users: Identifies the trekker.
+next_checkpoint → trekking_routes.schedule_plan: Follows planned itinerary.
+sos_alert → alerts: Triggers emergency notifications.
+📂 alerts
+Purpose: Centralizes real-time alerts.
+Fields:
+type: Alert category (e.g., "Bus Delay", "SOS").
+entity: Links to busId or trekkerId.
+message, timestamp, severity: Alert details.
+location (for SOS): Emergency coordinates.
+Connections:
+entity → live_buses or trek_live_status: Specifies affected entity.
+location → trek_live_status: Pinpoints SOS events.
+📂 weather_live
+Purpose: Provides real-time weather for routes and treks.
+Fields:
+condition, temp_c, wind_speed: Current weather data.
+last_updated: Timestamp.
+Connections:
+routeId → routes: Weather for bus routes.
+trekId → trekking_routes: Weather for trekking areas.
+Used by AI for scheduling adjustments.
+How They Connect: A Workflow Example
+User Books a Bus Trip:
+User (userId1) books a trip via bookings (bookingId1), linked to busId1 and routeId1.
+Payment is recorded in payments (paymentId1), updating users.total_spent.
+buses.seats_available decreases, and bookings.tracking_id is generated.
+Bus Starts Trip:
+live_buses.busId1 updates with lat, lng, next_stop, and eta_next_stop based on routes.routeId1.stops.
+passengers_onboard increases when tracking_id is scanned, syncing with bookings.
+User Tracks Bus:
+user_locations.userId1 shows nearest_bus as busId1 and eta_to_stop, calculated using live_buses and routes.stops.
+Trekking Adventure:
+User (userId3) starts trek (trekId1), tracked in trek_live_status.trekkerId1.
+next_checkpoint and eta_checkpoint follow trekking_routes.schedule_plan.
+If sos_alert triggers, alerts records it with location.
+Weather Impacts:
+weather_live.routeId1 shows "Rain", prompting live_buses.busId1.alerts to update with a delay.
+Event Planning:
+User plans to attend events.eventId1, using tourism_sites.siteId5 (Puri Beach) and weather_live for conditions.
+Future Reference Notes
+Scalability: Add indexes on userId, busId, routeId for faster queries.
+AI Integration: Use live_buses.eta_next_stop, weather_live, and trek_live_status for real-time predictions.
+Security Rules: Restrict arka_realtime writes to authenticated devices (buses, trekkers) and reads to relevant users.
+Data Sync: Periodically sync arka_realtime (e.g., current_location) to arka for historical records.
+
+
+
+Final Overview of All Pages
+1. User Page (Post-Login Dashboard)
+Purpose: Central hub for users to manage their travel, trekking, tourism, payments, and more after logging in.
+Data Sources:
+arka/users, arka/bookings, arka/payments, arka/routes, arka/buses, arka/tourism_sites, arka/trekking_routes, arka/events, arka_realtime/user_locations, arka_realtime/live_buses, arka_realtime/trek_live_status, arka_realtime/weather_live, arka_realtime/alerts
+Content (Organized into Sections):
+Profile:
+Display/Edit: name, email, phone, address, preferences, join_date, total_spent.
+Bookings & Travel:
+Saved Routes: saved_routes → routes (origin, destination, ticket_price).
+Current Booking: bookingId → busId, seat_number, travel_date, tracking_id.
+Travel History: travel_history → bookingId, date, destination.
+Bus Tracking: user_locations (lat, lng, nearest_bus_stop, eta_to_stop) + live_buses (lat, lng, next_stop, eta_next_stop).
+Trekking:
+Plans: trekking_routes (name, difficulty, schedule_plan).
+Live Tracking: trek_live_status (lat, lng, altitude, next_checkpoint, sos_alert).
+Weather: weather_live (condition, temp_c).
+Tourism Explorer:
+Sites: tourism_sites (name, location, entry_fee, images, 3D_model).
+Weather: weather_live.
+Payments:
+List: payments (amount, status, method, transaction_id) → bookings.
+Customer Support:
+Form: Submit issue → alerts (type: "Support").
+Events:
+List: events (name, date, ticket_price) + Register action.
+Weather Overview:
+weather_live (condition, temp_c, wind_speed).
+Trip Planner:
+Combine routes, trekking_routes, tourism_sites, events + weather_live.
+Notifications:
+alerts (type, message, severity).
+Rewards & Offers:
+Points based on total_spent, offers list.
+Feedback:
+Rate bookingId, trekId, or eventId.
+Connections:
+To Bus Driver/Conductor: tracking_id verified → updates live_buses.passengers_onboard.
+To Admin: users, bookings, payments managed; alerts resolved.
+To Event Organizer: Registers for events, visible to organizer.
+2. Bus Driver/Conductor Page
+Purpose: For staff to manage their bus, verify passengers, and report status/alerts.
+Data Sources:
+arka/buses, arka/bookings, arka_realtime/live_buses, arka_realtime/alerts
+Content:
+Bus Info: route, driver.name, conductor.name, seats_available, trip_frequency.
+Schedule: schedule (trip timings).
+Live Status: live_buses (lat, lng, speed, next_stop, eta_next_stop, status) + Update status.
+Passenger Verification: Scan bookingId.tracking_id → Display userId, seat_number + Confirm boarding.
+Alerts: alerts (type, message) + Report new alert.
+Connections:
+To User: Verifies tracking_id from User’s booking, updates passengers_onboard.
+To Admin: Reports alerts (e.g., delays), visible in Admin dashboard.
+3. Admin Page
+Purpose: For you to oversee all operations, manage data, and monitor real-time activity.
+Data Sources:
+All arka nodes (users, buses, routes, bookings, payments, tourism_sites, trekking_routes, events)
+All arka_realtime nodes (live_buses, user_locations, trek_live_status, alerts, weather_live)
+Content:
+User Management: List/Edit users (name, email, total_spent).
+Bus Management: List/Edit buses (route, schedule, total_revenue).
+Route Management: List/Edit routes (origin, destination, ticket_price).
+Booking Overview: List bookings (userId, busId, payment_status) + Cancel/Confirm.
+Payment Dashboard: List payments + Total revenue.
+Live Monitoring: Map of live_buses + user_locations (status, passengers_onboard).
+Trekking Oversight: trek_live_status (lat, lng, sos_alert) + Respond to SOS.
+Event Management: List/Edit events + View registrants.
+Alerts Dashboard: List alerts + Resolve/Notify.
+Connections:
+To User: Manages users, bookings, resolves alerts seen in Notifications.
+To Bus Driver/Conductor: Oversees buses, live_buses, responds to staff-reported alerts.
+To Event Organizer: Manages events data.
+4. Event Organizer Page
+Purpose: For organizers to create events and track attendees.
+Data Sources:
+arka/events, arka/users (for registrants)
+Content:
+Event Creation: Input name, date, time, location, ticket_price, rules → Save eventId.
+Event List: Display events + Edit/Delete.
+Attendee Tracking: List registrants (userId → name, email) + Export list.
+Connections:
+To User: Users register via User Page, visible here as attendees.
+To Admin: events managed/approved by Admin.
+Connections Between Pages
+User ↔ Bus Driver/Conductor:
+Flow: User books a trip (bookings) → Driver/Conductor scans tracking_id → Updates live_buses.passengers_onboard.
+Data: arka/bookings.tracking_id → arka_realtime/live_buses.passengers_onboard.
+User ↔ Admin:
+Flow: User’s actions (bookings, payments, support requests) → Admin manages data and resolves issues.
+Data: arka/users, arka/bookings, arka/payments → Admin edits; arka_realtime/alerts → Admin resolves.
+User ↔ Event Organizer:
+Flow: User registers for an event → Organizer sees attendees.
+Data: arka/events → User registers → arka/users data visible to Organizer.
+Bus Driver/Conductor ↔ Admin:
+Flow: Staff updates live_buses.status or reports alerts → Admin monitors and responds.
+Data: arka_realtime/live_buses, arka_realtime/alerts → Admin dashboard.
+Event Organizer ↔ Admin:
+Flow: Organizer creates events → Admin approves/manages.
+Data: arka/events → Admin oversees.
+Internal User Page Connections:
+Bookings & Travel ↔ Payments: bookingId links to paymentId.
+Trekking ↔ Notifications: sos_alert triggers alerts.
+Tourism Explorer ↔ Trip Planner: Sites added to custom itinerary.
+Events ↔ Rewards: Registration might earn points.
+Final Notes
+Database Split:
+arka (static) for persistent data (Firestore).
+arka_realtime (live) for dynamic updates (Realtime Database).
+Security: Use Firebase Authentication to restrict access (e.g., userId for User Page, staff credentials for Driver/Conductor).
+UI Suggestion:
+User Page: Tabbed dashboard (mobile: bottom nav, desktop: sidebar).
+Driver/Conductor: Single-bus focus with map and passenger list.
+Admin: Multi-panel dashboard with filters and maps.
+Event Organizer: Simple CRUD interface.
+
+
+
+
+
+
+
