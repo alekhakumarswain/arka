@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arka - Bus Tracking</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #1a1a3d; color: white; }
+    .map-placeholder { height: 400px; background: #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .navbar { background: rgba(0, 0, 0, 0.6); }
+    .navbar-brand { font-size: 1.8rem; font-weight: bold; color: #00aaff !important; }
+    .nav-link { color: white !important; }
+    .nav-link:hover { color: #00aaff !important; }
+    .card { background: rgba(255, 255, 255, 0.1); border: none; }
+    .btn { transition: transform 0.3s ease; }
+    .btn:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/index.html">Arka</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="/pages/bus-tracking.html">Bus Tracking</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/booking.html">Book Tickets</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/tourism.html">Tourism</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/trekking.html">Trekking</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/events.html">Events</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/profile.html">Profile</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Real-Time Bus Tracking</h1>
+    <div class="map-placeholder mb-4">Google Maps API Placeholder (Live Bus Location)</div>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card text-white p-3">
+          <h5>Bus #123 - Puri to Bhubaneswar</h5>
+          <p>ETA: 15 mins | Distance: 5 km</p>
+          <button class="btn btn-primary">Contact Driver</button>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-white p-3">
+          <h5>Bus #456 - Cuttack to Puri</h5>
+          <p>ETA: 10 mins | Distance: 3 km</p>
+          <button class="btn btn-primary">Contact Conductor</button>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-white p-3">
+          <h5>Nearest Stop</h5>
+          <p>Location: Main Road Stop | 500m away</p>
+          <button class="btn btn-outline-light">View Route</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

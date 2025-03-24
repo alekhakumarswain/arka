@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arka - Book Tickets</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #1a1a3d; color: white; }
+    .navbar { background: rgba(0, 0, 0, 0.6); }
+    .navbar-brand { font-size: 1.8rem; font-weight: bold; color: #00aaff !important; }
+    .nav-link { color: white !important; }
+    .nav-link:hover { color: #00aaff !important; }
+    .form-control { background: rgba(255, 255, 255, 0.1); color: white; border: none; }
+    .btn { transition: transform 0.3s ease; }
+    .btn:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/index.html">Arka</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/pages/bus-tracking.html">Bus Tracking</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/pages/booking.html">Book Tickets</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/tourism.html">Tourism</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/trekking.html">Trekking</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/events.html">Events</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/profile.html">Profile</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Book Your Bus Ticket</h1>
+    <form class="row g-3">
+      <div class="col-md-6">
+        <label for="from" class="form-label">From</label>
+        <input type="text" class="form-control" id="from" placeholder="e.g., Puri">
+      </div>
+      <div class="col-md-6">
+        <label for="to" class="form-label">To</label>
+        <input type="text" class="form-control" id="to" placeholder="e.g., Bhubaneswar">
+      </div>
+      <div class="col-md-6">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" class="form-control" id="date">
+      </div>
+      <div class="col-md-6">
+        <label for="seats" class="form-label">Seats</label>
+        <select class="form-control" id="seats">
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+        </select>
+      </div>
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary btn-lg">Search Buses</button>
+      </div>
+    </form>
+    <div class="mt-4 text-center">
+      <p>After search: Select your seat → Pay via UPI/Card → Get QR Ticket</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arka - 3D Map of Odisha</title>
+  <!-- Bootstrap CSS (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Inline CSS -->
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1a3c34 0%, #d97706 100%); /* Odisha-inspired gradient */
+      font-family: 'Arial', sans-serif;
+    }
+
+    #map-container {
+      width: 100%;
+      height: 100vh;
+    }
+
+    #tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: #f59e0b; /* Saffron color */
+      padding: 8px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 1000;
+      display: none;
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.7);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 3;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .navbar-brand {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #f59e0b !important; /* Saffron/gold for Odisha culture */
+      text-transform: uppercase;
+    }
+
+    .nav-link {
+      color: white !important;
+      font-size: 1.1rem;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #f59e0b !important;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/ARKA/index.html">Arka</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/ARKA/pages/bus-tracking.html">Bus Tracking</a></li>
+          <li class="nav-item"><a class="nav-link" href="/ARKA/pages/booking.html">Book Tickets</a></li>
+          <li class="nav-item"><a class="nav-link" href="/ARKA/pages/tourism.html">Tourism</a></li>
+          <li class="nav-item"><a class="nav-link" href="/ARKA/pages/trekking.html">Trekking</a></li>
+          <li class="nav-item"><a class="nav-link" href="/ARKA/pages/events.html">Events</a></li>
+          <li class="nav-item"><a class="nav-link" href="/ARKA/pages/profile.html">Profile</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 3D Map Container -->
+  <div id="map-container"></div>
+
+  <!-- Tooltip for Hover -->
+  <div id="tooltip"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/OBJLoader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Inline JavaScript -->
+  <script>
+    // Scene Setup
+    const container = document.getElementById('map-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    // Background
+    scene.background = new THREE.Color(0x1a3c34); // Forest green for Odisha landscapes
+
+    // Orbit Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.minDistance = 2; // Allow closer zooming
+    controls.maxDistance = 50; // Increased max distance for better overview
+    controls.maxPolarAngle = Math.PI / 2.5; // Limit vertical rotation for 3D map feel
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 10, 5);
+    scene.add(directionalLight);
+
+    // Terrain (Simplified Odisha Map Base)
+    const terrainGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
+    const terrainMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0x2d6a4f, // Earthy green for Odisha terrain
+      side: THREE.DoubleSide,
+      wireframe: false
+    });
+    const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
+    terrain.rotation.x = -Math.PI / 2; // Lay flat
+    terrain.position.y = -1;
+    scene.add(terrain);
+
+    // Add subtle elevation to terrain
+    const vertices = terrainGeometry.attributes.position.array;
+    for (let i = 0; i < vertices.length; i += 3) {
+      vertices[i + 2] = Math.sin(i / 10) * 0.5; // Simple elevation effect
+    }
+    terrainGeometry.attributes.position.needsUpdate = true;
+
+    // Landmarks (Using kedarmathTemple.obj Model)
+    const landmarks = [
+      { name: "Konark Sun Temple", x: 3, z: -2, color: 0xf59e0b },
+      { name: "Jagannath Temple, Puri", x: 1, z: 3, color: 0xb91c1c },
+      { name: "Lingaraj Temple, Bhubaneswar", x: -2, z: -1, color: 0xd97706 }
+    ];
+
+    const landmarkMeshes = [];
+    const objLoader = new THREE.OBJLoader();
+
+    landmarks.forEach((landmark, index) => {
+      objLoader.load(
+        '../assets/models/kedarnathtemple.obj', // Use absolute path
+        (object) => {
+          // Compute the bounding box to understand the model's size
+          const box = new THREE.Box3().setFromObject(object);
+          const size = new THREE.Vector3();
+          box.getSize(size);
+          console.log(`Model size for ${landmark.name}: ${size.x}, ${size.y}, ${size.z}`); // Log the size for debugging
+
+          // Traverse the loaded model to apply a material
+          object.traverse((child) => {
+            if (child.isMesh) {
+              child.material = new THREE.MeshPhongMaterial({ color: landmark.color });
+              child.material.side = THREE.DoubleSide; // Ensure both sides are visible
+            }
+          });
+
+          // Adjust position to place the model on the terrain
+          object.position.y = -1 + (size.y / 2) * 0.005; // Offset to align the base with the terrain (y = -1)
+          object.position.x = landmark.x;
+          object.position.z = landmark.z;
+
+          // Scale the model
+          const scaleFactor = 0.02; // Current scale factor
+          object.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+          object.userData = { name: landmark.name };
+
+          // Add a bounding box helper to visualize the model's size (for debugging)
+          const boxHelper = new THREE.BoxHelper(object, 0xff0000);
+          scene.add(boxHelper);
+
+          scene.add(object);
+          landmarkMeshes.push(object);
+
+          // Add a small Chakra above Konark
+          if (landmark.name === "Konark Sun Temple") {
+            const chakraGeometry = new THREE.TorusGeometry(0.4, 0.02, 16, 100);
+            const chakraMaterial = new THREE.MeshPhongMaterial({ color: 0xf59e0b, emissive: 0xb91c1c });
+            const chakra = new THREE.Mesh(chakraGeometry, chakraMaterial);
+            chakra.position.set(landmark.x, (size.y * scaleFactor) + 0.5, landmark.z); // Position Chakra just above the temple
+            chakra.rotation.x = Math.PI / 2;
+            scene.add(chakra);
+
+            // Animate Chakra rotation with GSAP
+            gsap.to(chakra.rotation, {
+              z: Math.PI * 2,
+              duration: 10,
+              repeat: -1,
+              ease: 'none',
+            });
+          }
+
+          // GSAP Animation: Pop-up effect for landmarks
+          gsap.from(object.position, {
+            y: -2,
+            duration: 1.5,
+            delay: index * 0.3,
+            ease: 'bounce.out'
+          });
+        },
+        (xhr) => {
+          console.log(`Loading ${landmark.name}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+        },
+        (error) => {
+          console.error(`Error loading model for ${landmark.name}:`, error);
+          // Fallback: Add a simple placeholder if the model fails to load
+          const placeholderGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+          const placeholderMaterial = new THREE.MeshPhongMaterial({ color: landmark.color });
+          const placeholder = new THREE.Mesh(placeholderGeometry, placeholderMaterial);
+          placeholder.position.set(landmark.x, 0, landmark.z);
+          placeholder.userData = { name: landmark.name };
+          scene.add(placeholder);
+          landmarkMeshes.push(placeholder);
+
+          gsap.from(placeholder.position, {
+            y: -2,
+            duration: 1.5,
+            delay: index * 0.3,
+            ease: 'bounce.out'
+          });
+        }
+      );
+    });
+
+    // Camera Position (Tilted 3D View like Google Maps)
+    camera.position.set(10, 10, 10); // Moved camera farther out for better overview
+    camera.lookAt(0, 0, 0);
+
+    // GSAP Animation: Smooth camera intro
+    gsap.from(camera.position, {
+      x: 15,
+      y: 15,
+      z: 15,
+      duration: 2,
+      ease: 'power2.out',
+      onUpdate: () => camera.lookAt(0, 0, 0)
+    });
+
+    // Raycaster for Interactivity
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const tooltip = document.getElementById('tooltip');
+    let hoveredLandmark = null;
+
+    container.addEventListener('mousemove', (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(landmarkMeshes, true); // Check children of the loaded model
+
+      if (intersects.length > 0) {
+        const landmark = intersects[0].object.parent || intersects[0].object; // Handle nested objects
+        if (hoveredLandmark !== landmark) {
+          // Reset previous hover effect
+          if (hoveredLandmark) {
+            gsap.to(hoveredLandmark.scale, { x: 1, y: 1, z: 1, duration: 0.3 });
+          }
+
+          // Hover effect with GSAP
+          hoveredLandmark = landmark;
+          gsap.to(landmark.scale, { x: 1.3, y: 1.3, z: 1.3, duration: 0.3 });
+
+          // Show tooltip
+          tooltip.style.display = 'block';
+          tooltip.textContent = landmark.userData.name;
+          tooltip.style.left = `${event.clientX + 10}px`;
+          tooltip.style.top = `${event.clientY - 10}px`;
+        }
+      } else {
+        if (hoveredLandmark) {
+          gsap.to(hoveredLandmark.scale, { x: 1, y: 1, z: 1, duration: 0.3 });
+          hoveredLandmark = null;
+        }
+        tooltip.style.display = 'none';
+      }
+    });
+
+    // Click to Zoom on Landmark
+    container.addEventListener('click', (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(landmarkMeshes, true);
+
+      if (intersects.length > 0) {
+        const landmark = intersects[0].object.parent || intersects[0].object;
+        const targetPosition = new THREE.Vector3(
+          landmark.position.x + 2,
+          landmark.position.y + 2,
+          landmark.position.z + 2
+        );
+
+        // GSAP Animation: Smooth zoom to landmark
+        gsap.to(camera.position, {
+          x: targetPosition.x,
+          y: targetPosition.y,
+          z: targetPosition.z,
+          duration: 1,
+          ease: 'power2.inOut',
+          onUpdate: () => camera.lookAt(landmark.position)
+        });
+      }
+    });
+
+    // Render Loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Resize Handling
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+  </script>
+</body>
+</html>

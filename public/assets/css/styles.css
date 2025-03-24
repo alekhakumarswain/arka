@@ -1,0 +1,34 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#scene-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#overlay {
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.3); /* Slight overlay for readability */
+  height: 100vh;
+}
+
+h1, p {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Shadow for better contrast */
+}
+
+.btn {
+  transition: transform 0.3s ease;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}

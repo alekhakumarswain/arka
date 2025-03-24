@@ -1,89 +1,390 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arka - Smart Tourism App</title>
+  <!-- Bootstrap CSS (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Animate.css (CDN) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/11.5.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/11.5.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/11.5.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+  <!-- Inline CSS -->
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: auto;
+      background: linear-gradient(135deg, #1a3c34 0%, #d97706 100%); /* Odisha-inspired: forest green to saffron sunset */
+      color: white;
+      font-family: 'Arial', sans-serif;
+      scroll-behavior: smooth;
+    }
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
+    #scene-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: 1;
+    }
+
+    #overlay {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.7);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 3;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .navbar-brand {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #f59e0b !important; /* Saffron/gold for Odisha culture */
+      text-transform: uppercase;
+    }
+
+    .nav-link {
+      color: white !important;
+      font-size: 1.1rem;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #f59e0b !important;
+      transform: translateY(-2px);
+    }
+
+    .welcome-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      z-index: 2;
+      text-align: center;
+    }
+
+    .welcome-section h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+      background: linear-gradient(90deg, #f59e0b, #b91c1c); /* Saffron to red for Odisha vibrancy */
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .welcome-section p {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+    }
+
+    .content-section {
+      padding: 6rem 2rem;
+      background: rgba(0, 0, 0, 0.85);
+    }
+
+    .content-section .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .content-section h2 {
+      color: #f59e0b; /* Saffron/gold */
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-top: 3rem;
+      text-align: center;
+      border-bottom: 2px solid #f59e0b;
+      padding-bottom: 0.5rem;
+    }
+
+    .content-section h3 {
+      color: #b91c1c; /* Red for Odisha vibrancy */
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-top: 2rem;
+    }
+
+    .content-section h4 {
+      color: #ffffff;
+      font-size: 1.4rem;
+      margin-top: 1rem;
+    }
+
+    .content-section p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin: 0.5rem 0;
+    }
+
+    .content-section ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 1rem 0;
+    }
+
+    .content-section ul li {
+      font-size: 1.1rem;
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    .content-section ul li:before {
+      content: "🛕"; /* Temple icon for Odisha culture */
+      color: #f59e0b;
+      position: absolute;
+      left: 0;
+    }
+
+    .feature-card {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 15px;
+      margin: 1rem 0;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .welcome-section {
+        padding: 2rem;
       }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+      .welcome-section h1 {
+        font-size: 2.5rem;
+      }
+      .welcome-section p {
+        font-size: 1.2rem;
+      }
+      .content-section {
+        padding: 4rem 1rem;
+      }
+      .content-section h2 {
+        font-size: 2rem;
+      }
+      .content-section h3 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 3D Scene Container -->
+  <div id="scene-container"></div>
+
+  <!-- Overlay with Navigation and Content -->
+  <div id="overlay">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">Arka</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/ARKA/pages/bus-tracking.html">Bus Tracking</a></li>
+            <li class="nav-item"><a class="nav-link" href="/ARKA/pages/booking.html">Book Tickets</a></li>
+            <li class="nav-item"><a class="nav-link" href="/ARKA/pages/tourism.html">Tourism</a></li>
+            <li class="nav-item"><a class="nav-link" href="/ARKA/pages/trekking.html">Trekking</a></li>
+            <li class="nav-item"><a class="nav-link" href="/ARKA/pages/events.html">Events</a></li>
+            <li class="nav-item"><a class="nav-link" href="/ARKA/pages/profile.html">Profile</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <h1 class="animate__animated animate__fadeIn">Welcome to Arka</h1>
+      <p class="animate__animated animate__fadeIn animate__delay-1s">Explore Odisha’s Cultural Wonders with Arka</p>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+    <!-- App Features Section -->
+    <div class="content-section">
+      <div class="container">
+        <h2>🛕 Arka Features</h2>
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
-        }
+        <div class="feature-card">
+          <h3>🏖 Tourism: Discover Odisha’s Wonders</h3>
+          <p>An <strong>AI-powered tourism assistant</strong> to explore Odisha’s treasures:</p>
+          <h4>Features:</h4>
+          <ul>
+            <li>Attraction Discovery: Explore temples, beaches, and historical sites like Puri and Bhubaneswar.</li>
+            <li>AR/VR Virtual Tours: Experience heritage sites with immersive tours.</li>
+            <li>Local Food & Handicrafts: Discover Odia cuisine and crafts like Pattachitra and Sambalpuri weaves.</li>
+            <li>Personalized Itineraries: Tailored travel plans for your Odisha journey.</li>
+          </ul>
+          <p><strong>User Benefit:</strong> Uncover Odisha’s hidden gems and immerse in its rich heritage.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🎉 Tradition: Celebrate Odisha’s Culture</h3>
+          <p>Connect with <strong>Odisha’s vibrant traditions</strong>.</p>
+          <h4>Features:</h4>
+          <ul>
+            <li>Festival Alerts: Stay updated on events like Rath Yatra and Durga Puja.</li>
+            <li>Handicraft Shopping: Buy authentic Odia crafts like silver filigree and applique work.</li>
+            <li>Event Booking: Secure tickets for cultural performances like Odissi dance.</li>
+            <li>Heritage Walks & Storytelling: Guided tours to explore Odisha’s history.</li>
+          </ul>
+          <p><strong>User Benefit:</strong> Experience Odisha’s traditions and festivals up close.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🏕 Trekking & Adventure in Odisha</h3>
+          <p>A <strong>GPS-guided trekking solution</strong> for Odisha’s natural wonders.</p>
+          <h4>Features:</h4>
+          <ul>
+            <li>Trekking Trail Maps: Explore routes in Daringbadi, Satkosia, and more.</li>
+            <li>Difficulty Ratings & Reviews: Insights from fellow adventurers.</li>
+            <li>Weather & Safety Alerts: Stay informed about rain, landslides, etc.</li>
+            <li>Group Trek Planning: Connect with others for group treks.</li>
+          </ul>
+          <p><strong>User Benefit:</strong> Adventure safely through Odisha’s scenic landscapes.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🚍 Transport: Travel Odisha with Ease</h3>
+          <p>A <strong>live tracking system</strong> for private buses across Odisha.</p>
+          <h4>Features:</h4>
+          <ul>
+            <li>GPS Live Location Tracking: Know your bus’s exact location.</li>
+            <li>Arrival Time Estimation: AI predicts arrivals with delay updates.</li>
+            <li>Nearby Bus Stops & Route Info: Find stops and routes easily.</li>
+            <li>Push Notifications: Get alerts for bus updates.</li>
+            <li>Direct Driver/Conductor Contact: Call or chat for real-time updates.</li>
+          </ul>
+          <p><strong>User Benefit:</strong> Travel Odisha hassle-free with real-time updates.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🎟 Smart Ticket Booking</h3>
+          <p>Seamless <strong>bus travel</strong> booking for your Odisha journey.</p>
+          <h4>Features:</h4>
+          <ul>
+            <li>Bus Seat Booking: Pay securely via UPI, cards, or wallets.</li>
+            <li>QR-Based Tickets: Paperless travel with a scan.</li>
+            <li>Seat Selection & Offers: Pick your seat and enjoy discounts.</li>
+            <li>Booking History & Refunds: Track trips and manage refunds.</li>
+          </ul>
+          <p><strong>User Benefit:</strong> Book your Odisha travel in minutes!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Inline JavaScript -->
+  <script>
+    // Scene setup
+    const container = document.getElementById('scene-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    // Background
+    scene.background = new THREE.Color(0x1a3c34); // Forest green for Odisha landscapes
+
+    // Globe (Central Sphere with Texture)
+    const globeGeometry = new THREE.SphereGeometry(1.5, 32, 32);
+    const globeTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
+    const globeMaterial = new THREE.MeshPhongMaterial({ map: globeTexture });
+    const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+    scene.add(globe);
+
+    // Odisha Pattern Ring (Inspired by traditional designs)
+    const ringGeometry = new THREE.TorusGeometry(2, 0.05, 16, 100, Math.PI * 2);
+    const ringMaterial = new THREE.MeshPhongMaterial({ color: 0xf59e0b, emissive: 0xb91c1c }); // Saffron with red glow
+    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+    ring.rotation.x = Math.PI / 2; // Rotate to lie flat
+    scene.add(ring);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffffff, 1);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
+
+    // Camera position
+    camera.position.z = 5;
+
+    // GSAP Animations
+    gsap.to(globe.rotation, {
+      y: Math.PI * 2,
+      duration: 20,
+      repeat: -1,
+      ease: 'none',
+    });
+    gsap.to(ring.rotation, {
+      z: Math.PI * 2,
+      duration: 15,
+      repeat: -1,
+      ease: 'none',
+    });
+
+    // Mouse Interaction
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+      gsap.to(globe.rotation, {
+        x: mouseY * 0.5,
+        y: mouseX * 0.5,
+        duration: 1,
       });
-    </script>
-  </body>
+    });
+
+    // Click Interaction (Zoom on Click)
+    document.addEventListener('click', () => {
+      gsap.to(camera.position, {
+        z: camera.position.z === 5 ? 3 : 5,
+        duration: 1,
+        ease: 'power2.inOut',
+      });
+    });
+
+    // Render loop
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Resize handling
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+  </script>
+</body>
 </html>
