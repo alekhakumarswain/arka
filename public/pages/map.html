@@ -86,7 +86,7 @@
     // Scene Setup
     const container = document.getElementById('map-container');
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000); // Reduced FOV to make background appear smaller
+    const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 0.1, 1000); // Reduced FOV to make background appear smaller
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -101,14 +101,22 @@
 
     // Skybox using a single texture (equirectangular panorama) - Normal size, no scaling
     const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(
-      '../assets/images/mountain-panorama.jpg',
-      (skyTexture) => {
-        skyTexture.mapping = THREE.EquirectangularReflectionMapping;
-        skyTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        scene.background = skyTexture;
-        console.log('Mountain panorama applied as scene background');
-      },
+
+    let skyTexture = null;
+let backgroundRotation = 0;
+const rotationSpeed = 0.0005;
+
+textureLoader.load(
+  '../assets/images/mountain-panorama.jpg',
+  (loadedTexture) => {
+    skyTexture = loadedTexture;
+    skyTexture.mapping = THREE.EquirectangularReflectionMapping;
+    skyTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    skyTexture.wrapS = THREE.RepeatWrapping;
+    skyTexture.wrapT = THREE.RepeatWrapping; // नया जोड़ें
+    skyTexture.repeat.set(1, 1); // नया जोड़ें
+    scene.background = skyTexture;
+  },
       undefined,
       (error) => {
         console.error('Error loading mountain-panorama.jpg:', error);
@@ -127,35 +135,35 @@
     controls.maxPolarAngle = Math.PI / 2;
     controls.minAzimuthAngle = -Infinity;
     controls.maxAzimuthAngle = Infinity;
-    const frontDoorPosition = new THREE.Vector3(0, 1, 0); // Temple position
+    const frontDoorPosition = new THREE.Vector3(-10, 12, 10); // Temple position
     controls.target.copy(frontDoorPosition);
 
     // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    scene.add(new THREE.AmbientLight(0xffffff, .15));
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 10, 5);
+    directionalLight.position.set(5, 25, 25);
     scene.add(directionalLight);
 
     // Terrain with enhanced sculpting (mountain-like)
-    const terrainGeometry = new THREE.PlaneGeometry(120, 120, 128, 128); // High resolution for detailed sculpting
+    const terrainGeometry = new THREE.PlaneGeometry(600, 600, 240, 240); // High resolution for detailed sculpting
     const terrainMaterial = new THREE.MeshPhongMaterial({ 
-      color: 0x5C4033, // Grayish-brown color for mountain-like appearance
+       // Grayish-brown color for mountain-like appearance
       specular: 0x222222,
-      shininess: 2,
+      shininess: 5,
       side: THREE.DoubleSide
     });
     const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
     terrain.rotation.x = -Math.PI / 2;
-    terrain.position.y = -1;
+    terrain.position.y = -1.2; // Slightly below the center to avoid z-fighting
     scene.add(terrain);
 
     // Load a rocky texture for the mountain-like terrain
     textureLoader.load(
-      '../assets/images/rock-texture.jpg', // Replace with a rock texture path
+      '../assets/images/rock-texture.png', // Replace with a rock texture path
       (rockTexture) => {
         rockTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
         rockTexture.wrapS = rockTexture.wrapT = THREE.RepeatWrapping;
-        rockTexture.repeat.set(10, 10);
+        rockTexture.repeat.set(1, 5);
         terrainMaterial.map = rockTexture;
         terrainMaterial.needsUpdate = true;
         console.log('Rock texture applied to terrain');
@@ -163,7 +171,7 @@
       undefined,
       (error) => {
         console.error('Error loading rock-texture.jpg:', error);
-        terrainMaterial.color.set(0x5C4033); // Fallback color
+        terrainMaterial.color.set(0x85a0d5); // Fallback color
         terrainMaterial.needsUpdate = true;
       }
     );
@@ -182,14 +190,14 @@
     terrainGeometry.computeVertexNormals();
 
     // Circular surface under the temple with snow texture
-    const circleGeometry = new THREE.CircleGeometry(5, 64); // Radius of 5, 64 segments for smoothness
+    const circleGeometry = new THREE.CircleGeometry(255, 164); // Radius of 5, 64 segments for smoothness
     const circleMaterial = new THREE.MeshPhongMaterial({
-      color: 0xffffff,
+      color: 0x85a0d5,
       side: THREE.DoubleSide
     });
     const circle = new THREE.Mesh(circleGeometry, circleMaterial);
     circle.rotation.x = -Math.PI / 2;
-    circle.position.set(0, -0.99, 0); // Slightly above the terrain to avoid z-fighting
+    circle.position.set(10, -0.99, 10); // Slightly above the terrain to avoid z-fighting
     scene.add(circle);
 
     // Apply snow texture to the circular surface
@@ -198,7 +206,7 @@
       (snowTexture) => {
         snowTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
         snowTexture.wrapS = snowTexture.wrapT = THREE.RepeatWrapping;
-        snowTexture.repeat.set(2, 2); // Adjusted for the smaller circular surface
+        snowTexture.repeat.set(12, 12); // Adjusted for the smaller circular surface
         circleMaterial.map = snowTexture;
         circleMaterial.needsUpdate = true;
         console.log('Snow texture applied to circular surface');
@@ -206,7 +214,7 @@
       undefined,
       (error) => {
         console.error('Error loading snow-texture.jpg:', error);
-        circleMaterial.color.set(0xffffff);
+        circleMaterial.color.set(0x85a0d5);
         circleMaterial.needsUpdate = true;
       }
     );
@@ -228,16 +236,17 @@
               const meshPosition = new THREE.Vector3();
               child.getWorldPosition(meshPosition);
               child.material = new THREE.MeshPhongMaterial({
-                color: meshPosition.y > 0 ? 0x0000FF : 0x808080,
-                specular: 0x222222,
-                shininess: 10,
+                color: meshPosition.y > 0 ? 0xFCCD78 : 0xC68688,
+                specular: 0xf9f8B8,
+                shininess: 20,
                 side: THREE.DoubleSide
               });
             }
           });
 
-          object.position.set(landmark.x, -1 + (size.y / 2) * 0.005, landmark.z);
-          const scaleFactor = 0.02;
+          object.position.set(landmark.x-38, 1.2 + (size.y / 2) * 0.005, landmark.z);
+object.scale.set(0.05, 0.05, 0.05);
+          const scaleFactor = 0.28;
           object.scale.set(scaleFactor, scaleFactor, scaleFactor);
           object.rotation.y = Math.PI / 2;
           object.userData = { name: landmark.name, originalScale: scaleFactor };
@@ -260,7 +269,8 @@
     });
 
     // Camera Position (adjusted to make background appear smaller)
-    camera.position.set(0, 5, 40); // Moved farther back to make background appear smaller
+    camera.position.set(-11, -5, 60);
+     // Moved farther back to make background appear smaller
     camera.lookAt(frontDoorPosition);
 
     // Interactivity (Tooltip only)
@@ -270,8 +280,8 @@
     let hoveredLandmark = null;
 
     container.addEventListener('mousemove', (event) => {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      mouse.x = (event.clientX / window.innerWidth) * 4 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 4 + 1;
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(landmarkMeshes, true);
       if (intersects.length > 0) {
@@ -280,8 +290,8 @@
           hoveredLandmark = landmark;
           tooltip.style.display = 'block';
           tooltip.textContent = landmark.userData.name;
-          tooltip.style.left = `${event.clientX + 1}px`;
-          tooltip.style.top = `${event.clientY + 1}px`;
+          tooltip.style.left = `${event.clientX + 6}px`;
+          tooltip.style.top = `${event.clientY + 6}px`;
         }
       } else {
         hoveredLandmark = null;
@@ -294,6 +304,13 @@
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
+
+      if(skyTexture) {
+    backgroundRotation += rotationSpeed;
+    skyTexture.offset.x = backgroundRotation % 1; // 0-1 के बीच रखने के लिए
+  }
+  controls.update();
+  renderer.render(scene, camera);
     }
     animate();
 
