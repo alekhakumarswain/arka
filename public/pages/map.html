@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arka - 3D Map of Odisha</title>
+  <title>Arka - 3D Satellite Map of Odisha</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body, html {
       margin: 0;
@@ -17,16 +18,14 @@
     #map-container {
       width: 100%;
       height: 100vh;
+      position: relative;
     }
-    #tooltip {
+    #leaflet-map {
       position: absolute;
-      color: #f59e0b;
-      padding: 8px 12px;
-      border-radius: 5px;
-      font-size: 14px;
-      pointer-events: none;
-      z-index: 1000;
-      display: none;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: block;
     }
     .navbar {
       background: rgba(0, 0, 0, 0.7);
@@ -51,6 +50,40 @@
       color: #f59e0b !important;
       transform: translateY(-2px);
     }
+    #popup {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      display: none;
+      max-width: 300px;
+      text-align: center;
+      transform: translate(-50%, -50%);
+    }
+    #popup h3 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      color: #f59e0b;
+    }
+    #popup p {
+      margin: 0 0 15px;
+      font-size: 1rem;
+      color: #333;
+    }
+    #popup button {
+      background: #f59e0b;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #popup button:hover {
+      background: #e68a00;
+    }
   </style>
 </head>
 <body>
@@ -73,244 +106,164 @@
     </div>
   </nav>
 
-  <div id="map-container"></div>
-  <div id="tooltip"></div>
+  <div id="map-container">
+    <div id="leaflet-map"></div>
+    <div id="popup">
+      <h3 id="popup-title"></h3>
+      <p id="popup-desc"></p>
+      <button id="popup-button">Visit</button>
+    </div>
+  </div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/OBJLoader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Scene Setup
+    // Initialize Leaflet Map with ArcGIS World Imagery
+    const leafletMap = L.map('leaflet-map').setView([20.9517, 85.0985], 7); // Center on Odisha, India
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+      maxZoom: 19,
+    }).addTo(leafletMap);
+
+    // Locations Data
+    const locations = [
+      {
+        name: "Konark Sun Temple",
+        lat: 19.8876,
+        lng: 86.0945,
+        desc: "A 13th-century CE Sun Temple at Konark, Odisha, known for its stunning architecture.",
+        url: "https://en.wikipedia.org/wiki/Konark_Sun_Temple"
+      },
+      {
+        name: "Kedarnath Temple",
+        lat: 30.7347,
+        lng: 79.0669,
+        desc: "A sacred Hindu temple dedicated to Lord Shiva, located in the Himalayas.",
+        url: "https://en.wikipedia.org/wiki/Kedarnath_Temple"
+      }
+    ];
+
+    // Three.js Setup
     const container = document.getElementById('map-container');
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 0.1, 1000); // Reduced FOV to make background appear smaller
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(renderer.domElement);
-
-    // Check WebGL support
-    if (!renderer.getContext()) {
-      console.error('WebGL is not supported in this browser.');
-    } else {
-      console.log('WebGL is supported.');
-    }
-
-    // Skybox using a single texture (equirectangular panorama) - Normal size, no scaling
-    const textureLoader = new THREE.TextureLoader();
-
-    let skyTexture = null;
-let backgroundRotation = 0;
-const rotationSpeed = 0.0005;
-
-textureLoader.load(
-  '../assets/images/mountain-panorama.jpg',
-  (loadedTexture) => {
-    skyTexture = loadedTexture;
-    skyTexture.mapping = THREE.EquirectangularReflectionMapping;
-    skyTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    skyTexture.wrapS = THREE.RepeatWrapping;
-    skyTexture.wrapT = THREE.RepeatWrapping; // नया जोड़ें
-    skyTexture.repeat.set(1, 1); // नया जोड़ें
-    scene.background = skyTexture;
-  },
-      undefined,
-      (error) => {
-        console.error('Error loading mountain-panorama.jpg:', error);
-        scene.background = new THREE.Color(0x87CEEB);
-      }
-    );
 
     // Orbit Controls
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
-    controls.enablePan = true;
-    controls.minDistance = 10;
+    controls.minDistance = 5;
     controls.maxDistance = 50;
     controls.maxPolarAngle = Math.PI / 2;
-    controls.minAzimuthAngle = -Infinity;
-    controls.maxAzimuthAngle = Infinity;
-    const frontDoorPosition = new THREE.Vector3(-10, 12, 10); // Temple position
-    controls.target.copy(frontDoorPosition);
 
     // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff, .15));
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 25, 25);
+    directionalLight.position.set(5, 10, 5);
     scene.add(directionalLight);
 
-    // Terrain with enhanced sculpting (mountain-like)
-    const terrainGeometry = new THREE.PlaneGeometry(600, 600, 240, 240); // High resolution for detailed sculpting
-    const terrainMaterial = new THREE.MeshPhongMaterial({ 
-       // Grayish-brown color for mountain-like appearance
-      specular: 0x222222,
-      shininess: 5,
-      side: THREE.DoubleSide
-    });
-    const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
-    terrain.rotation.x = -Math.PI / 2;
-    terrain.position.y = -1.2; // Slightly below the center to avoid z-fighting
-    scene.add(terrain);
+    // Map Plane
+    let mapPlane;
+    function initialize3D() {
+      const mapCanvas = document.createElement('canvas');
+      const mapContext = mapCanvas.getContext('2d');
+      mapCanvas.width = window.innerWidth;
+      mapCanvas.height = window.innerHeight;
 
-    // Load a rocky texture for the mountain-like terrain
-    textureLoader.load(
-      '../assets/images/rock-texture.png', // Replace with a rock texture path
-      (rockTexture) => {
-        rockTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        rockTexture.wrapS = rockTexture.wrapT = THREE.RepeatWrapping;
-        rockTexture.repeat.set(1, 5);
-        terrainMaterial.map = rockTexture;
-        terrainMaterial.needsUpdate = true;
-        console.log('Rock texture applied to terrain');
-      },
-      undefined,
-      (error) => {
-        console.error('Error loading rock-texture.jpg:', error);
-        terrainMaterial.color.set(0x85a0d5); // Fallback color
-        terrainMaterial.needsUpdate = true;
-      }
-    );
+      const leafletCanvas = leafletMap.getContainer().querySelector('.leaflet-tile-container img') || leafletMap.getContainer();
+      mapContext.drawImage(leafletCanvas, 0, 0, mapCanvas.width, mapCanvas.height);
 
-    // Sculpt the terrain to resemble a mountain
-    const vertices = terrainGeometry.attributes.position.array;
-    for (let i = 0; i < vertices.length; i += 3) {
-      const x = vertices[i];
-      const z = vertices[i + 1];
-      const distanceFromCenter = Math.sqrt(x * x + z * z);
-      const noise = (Math.sin(x / 5) * Math.cos(z / 5) + Math.sin(x / 10) * Math.cos(z / 10)) * 3; // Increased amplitude for more pronounced peaks
-      const height = noise * (1 - distanceFromCenter / 60); // Higher near the center, tapering off at edges
-      vertices[i + 2] = Math.max(height, 0); // Ensure no negative heights
+      const texture = new THREE.Texture(mapCanvas);
+      texture.needsUpdate = true;
+
+      const geometry = new THREE.PlaneGeometry(20, 20);
+      const material = new THREE.MeshPhongMaterial({ map: texture, side: THREE.DoubleSide });
+      mapPlane = new THREE.Mesh(geometry, material);
+      mapPlane.rotation.x = -Math.PI / 4;
+      scene.add(mapPlane);
+
+      // Add Temple Icons
+      const templeGeometry = new THREE.ConeGeometry(0.5, 1, 8); // Simple cone as temple icon
+      const templeMaterial = new THREE.MeshPhongMaterial({ color: 0xf59e0b });
+      locations.forEach(location => {
+        const temple = new THREE.Mesh(templeGeometry, templeMaterial);
+        const [x, z] = latLngToPlanePos(location.lat, location.lng);
+        temple.position.set(x, 0.5, z); // Slightly above the plane
+        temple.userData = location;
+        scene.add(temple);
+      });
+
+      // Camera Position
+      camera.position.set(0, 10, 15);
+      camera.lookAt(0, 0, 0);
+      controls.target.set(0, 0, 0);
+
+      // GSAP Animation
+      gsap.from(mapPlane.rotation, { x: 0, duration: 2, ease: "power2.out" });
+      gsap.from(camera.position, { z: 30, y: 20, duration: 2, ease: "power2.out" });
     }
-    terrainGeometry.attributes.position.needsUpdate = true;
-    terrainGeometry.computeVertexNormals();
 
-    // Circular surface under the temple with snow texture
-    const circleGeometry = new THREE.CircleGeometry(255, 164); // Radius of 5, 64 segments for smoothness
-    const circleMaterial = new THREE.MeshPhongMaterial({
-      color: 0x85a0d5,
-      side: THREE.DoubleSide
-    });
-    const circle = new THREE.Mesh(circleGeometry, circleMaterial);
-    circle.rotation.x = -Math.PI / 2;
-    circle.position.set(10, -0.99, 10); // Slightly above the terrain to avoid z-fighting
-    scene.add(circle);
+    // Convert Lat/Lng to Plane Coordinates
+    function latLngToPlanePos(lat, lng) {
+      const mapCenter = [20.9517, 85.0985]; // Center of Odisha
+      const planeWidth = 20; // Matches PlaneGeometry width
+      const latRange = 15; // Approx lat range for zoom level 7
+      const lngRange = 15; // Approx lng range for zoom level 7
+      const x = ((lng - mapCenter[1]) / lngRange) * planeWidth;
+      const z = ((mapCenter[0] - lat) / latRange) * planeWidth;
+      return [x, z];
+    }
 
-    // Apply snow texture to the circular surface
-    textureLoader.load(
-      '../assets/images/snow-texture.jpg',
-      (snowTexture) => {
-        snowTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        snowTexture.wrapS = snowTexture.wrapT = THREE.RepeatWrapping;
-        snowTexture.repeat.set(12, 12); // Adjusted for the smaller circular surface
-        circleMaterial.map = snowTexture;
-        circleMaterial.needsUpdate = true;
-        console.log('Snow texture applied to circular surface');
-      },
-      undefined,
-      (error) => {
-        console.error('Error loading snow-texture.jpg:', error);
-        circleMaterial.color.set(0x85a0d5);
-        circleMaterial.needsUpdate = true;
-      }
-    );
-
-    // Landmarks (Temple)
-    const landmarks = [{ name: "Kedarnath Temple", x: 0, z: 0 }];
-    const landmarkMeshes = [];
-    const objLoader = new THREE.OBJLoader();
-
-    landmarks.forEach((landmark, index) => {
-      objLoader.load(
-        '../assets/models/temples/kedarnathtemple.obj',
-        (object) => {
-          const box = new THREE.Box3().setFromObject(object);
-          const size = box.getSize(new THREE.Vector3());
-
-          object.traverse((child) => {
-            if (child.isMesh) {
-              const meshPosition = new THREE.Vector3();
-              child.getWorldPosition(meshPosition);
-              child.material = new THREE.MeshPhongMaterial({
-                color: meshPosition.y > 0 ? 0xFCCD78 : 0xC68688,
-                specular: 0xf9f8B8,
-                shininess: 20,
-                side: THREE.DoubleSide
-              });
-            }
-          });
-
-          object.position.set(landmark.x-38, 1.2 + (size.y / 2) * 0.005, landmark.z);
-object.scale.set(0.05, 0.05, 0.05);
-          const scaleFactor = 0.28;
-          object.scale.set(scaleFactor, scaleFactor, scaleFactor);
-          object.rotation.y = Math.PI / 2;
-          object.userData = { name: landmark.name, originalScale: scaleFactor };
-          scene.add(object);
-          landmarkMeshes.push(object);
-        },
-        (xhr) => console.log(`Loading ${landmark.name}: ${(xhr.loaded / xhr.total * 100)}% loaded`),
-        (error) => {
-          console.error(`Error loading model for ${landmark.name}:`, error);
-          const placeholder = new THREE.Mesh(
-            new THREE.BoxGeometry(0.5, 0.5, 0.5),
-            new THREE.MeshPhongMaterial({ color: 0x808080 })
-          );
-          placeholder.position.set(landmark.x, 0, landmark.z);
-          placeholder.userData = { name: landmark.name };
-          scene.add(placeholder);
-          landmarkMeshes.push(placeholder);
-        }
-      );
-    });
-
-    // Camera Position (adjusted to make background appear smaller)
-    camera.position.set(-11, -5, 60);
-     // Moved farther back to make background appear smaller
-    camera.lookAt(frontDoorPosition);
-
-    // Interactivity (Tooltip only)
+    // Popup Handling
+    const popup = document.getElementById('popup');
+    const popupTitle = document.getElementById('popup-title');
+    const popupDesc = document.getElementById('popup-desc');
+    const popupButton = document.getElementById('popup-button');
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-    const tooltip = document.getElementById('tooltip');
-    let hoveredLandmark = null;
 
-    container.addEventListener('mousemove', (event) => {
-      mouse.x = (event.clientX / window.innerWidth) * 4 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 4 + 1;
+    container.addEventListener('click', (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(landmarkMeshes, true);
+      const intersects = raycaster.intersectObjects(scene.children);
       if (intersects.length > 0) {
-        const landmark = intersects[0].object.parent || intersects[0].object;
-        if (hoveredLandmark !== landmark) {
-          hoveredLandmark = landmark;
-          tooltip.style.display = 'block';
-          tooltip.textContent = landmark.userData.name;
-          tooltip.style.left = `${event.clientX + 6}px`;
-          tooltip.style.top = `${event.clientY + 6}px`;
+        const object = intersects[0].object;
+        if (object.userData && object.userData.name) {
+          const data = object.userData;
+          popupTitle.textContent = data.name;
+          popupDesc.textContent = data.desc;
+          popupButton.onclick = () => window.open(data.url, '_blank');
+          popup.style.left = `${event.clientX}px`;
+          popup.style.top = `${event.clientY}px`;
+          popup.style.display = 'block';
+          gsap.fromTo(popup, { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(1.7)" });
         }
       } else {
-        hoveredLandmark = null;
-        tooltip.style.display = 'none';
+        popup.style.display = 'none';
       }
     });
+
+    // Wait for tiles to load
+    leafletMap.on('load', () => {
+      setTimeout(() => initialize3D(), 2000);
+    });
+    leafletMap._container.dispatchEvent(new Event('load'));
 
     // Render Loop
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
-
-      if(skyTexture) {
-    backgroundRotation += rotationSpeed;
-    skyTexture.offset.x = backgroundRotation % 1; // 0-1 के बीच रखने के लिए
-  }
-  controls.update();
-  renderer.render(scene, camera);
     }
     animate();
 
@@ -323,3 +276,4 @@ object.scale.set(0.05, 0.05, 0.05);
   </script>
 </body>
 </html>
+
