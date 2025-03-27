@@ -1,0 +1,277 @@
+[
+    {
+      "category": "Devi",
+      "name": "Kamakhya Temple",
+      "lat": 26.1665,
+      "lng": 91.7055,
+      "desc": "A major Shakti Peeth in Guwahati, Assam, dedicated to Goddess Kamakhya.",
+      "url": "",
+      "emoji": "🌺"
+    },
+    {
+      "category": "Devi",
+      "name": "Kalighat Kali Temple",
+      "lat": 22.5200,
+      "lng": 88.3469,
+      "desc": "A prominent Shakti Peeth in Kolkata, West Bengal, dedicated to Goddess Kali.",
+      "url": "",
+      "emoji": "🔥"
+    },
+    {
+      "category": "Devi",
+      "name": "Vaishno Devi Temple",
+      "lat": 33.0299,
+      "lng": 74.9492,
+      "desc": "A revered Shakti Peeth in Katra, Jammu and Kashmir, dedicated to Goddess Vaishno Devi.",
+      "url": "",
+      "emoji": "🙏"
+    },
+    {
+      "category": "Devi",
+      "name": "Jwalamukhi Temple",
+      "lat": 31.8746,
+      "lng": 76.3202,
+      "desc": "A Shakti Peeth in Himachal Pradesh, known for its eternal flames, dedicated to Goddess Jwalamukhi.",
+      "url": "",
+      "emoji": "🔥"
+    },
+    {
+      "category": "Devi",
+      "name": "Ambaji Temple",
+      "lat": 24.3315,
+      "lng": 72.8491,
+      "desc": "A Shakti Peeth in Gujarat, dedicated to Goddess Amba.",
+      "url": "",
+      "emoji": "🌺"
+    },
+    {
+      "category": "Devi",
+      "name": "Attukal Bhagavathy Temple",
+      "lat": 8.4721,
+      "lng": 76.9475,
+      "desc": "A Shakti Peeth in Thiruvananthapuram, Kerala, dedicated to Goddess Bhagavathy.",
+      "url": "",
+      "emoji": "🙏"
+    },
+    {
+      "category": "Devi",
+      "name": "Naina Devi Temple",
+      "lat": 23.1278,
+      "lng": 81.8887,
+      "desc": "A Shakti Peeth in Madhya Pradesh, dedicated to Goddess Naina Devi.",
+      "url": "",
+      "emoji": "🏹"
+    },
+  
+    {
+      "category": "Lord Shiva",
+      "name": "Kedarnath Temple",
+      "lat": 30.7352,
+      "lng": 79.0669,
+      "desc": "A sacred Hindu temple dedicated to Lord Shiva, located in the Himalayas, representing the Sky element.",
+      "url": "./map/kedarnathtemple.html",
+      "emoji": "🕉️"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Kaleshwara Mukteeshwara Swamy Temple",
+      "lat": 18.8110,
+      "lng": 79.9067,
+      "desc": "A Shiva temple in Telangana, part of the Shiva Shakti Aksh Rekha alignment.",
+      "url": "",
+      "emoji": "🔱"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Srikalahasti Temple",
+      "lat": 13.749802,
+      "lng": 79.698410,
+      "desc": "A Shiva temple in Andhra Pradesh, representing the Air element in the Pancha Bhoota.",
+      "url": "",
+      "emoji": "🛕"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Ekambareswarar Temple",
+      "lat": 12.847604,
+      "lng": 79.699798,
+      "desc": "A Shiva temple in Kanchipuram, Tamil Nadu, representing the Earth element in the Pancha Bhoota.",
+      "url": "",
+      "emoji": "🌙"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Jambukeswara Temple",
+      "lat": 10.853383,
+      "lng": 78.705455,
+      "desc": "A Shiva temple in Thiruvanaikaval, Tamil Nadu, representing the Water element in the Pancha Bhoota.",
+      "url": "",
+      "emoji": "🔥"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Annamalaiyar Temple",
+      "lat": 12.231942,
+      "lng": 79.067694,
+      "desc": "A Shiva temple in Thiruvannamalai, Tamil Nadu, representing the Fire element in the Pancha Bhoota.",
+      "url": "",
+      "emoji": "🕉️"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Nataraja Temple",
+      "lat": 11.399596,
+      "lng": 79.693559,
+      "desc": "A Shiva temple in Chidambaram, Tamil Nadu, representing the Space element in the Pancha Bhoota.",
+      "url": "",
+      "emoji": "🛕"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Ramanathaswamy Temple",
+      "lat": 9.2881,
+      "lng": 79.3174,
+      "desc": "A sacred Hindu temple in Rameswaram, Tamil Nadu, dedicated to Lord Shiva, also part of the Char Dham.",
+      "url": "./map/ramanathaswamytemple.html",
+      "emoji": "🔱"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Amarnath Temple",
+      "lat": 34.2165,
+      "lng": 75.5089,
+      "desc": "A sacred cave temple in the Himalayas, dedicated to Lord Shiva, known for the natural ice lingam.",
+      "url": "./map/amarnathtemple.html",
+      "emoji": "🌙"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Somnath Temple",
+      "lat": 20.8880,
+      "lng": 70.4011,
+      "desc": "A sacred Jyotirlinga temple in Gujarat, dedicated to Lord Shiva.",
+      "url": "",
+      "emoji": "🕉️"
+    },
+    {
+      "category": "Lord Shiva",
+      "name": "Kashi Vishwanath Temple",
+      "lat": 25.3109,
+      "lng": 83.0106,
+      "desc": "A sacred Jyotirlinga temple in Varanasi, Uttar Pradesh, dedicated to Lord Shiva.",
+      "url": "",
+      "emoji": "🛕"
+    },
+  
+    {
+      "category": "Lord Vishnu",
+      "name": "Badrinath Temple",
+      "lat": 30.7447,
+      "lng": 79.4918,
+      "desc": "A holy Hindu temple dedicated to Lord Vishnu, located in the Garhwal Himalayas, part of the Char Dham pilgrimage.",
+      "url": "./map/badrinathtemple.html",
+      "emoji": "🌀"
+    },
+    {
+      "category": "Lord Vishnu",
+      "name": "Jagannath Temple",
+      "lat": 19.8049,
+      "lng": 85.8177,
+      "desc": "A famous Hindu temple dedicated to Lord Jagannath, located in Puri, Odisha, known for the annual Rath Yatra festival.",
+      "url": "./map/jagannathtemple.html",
+      "emoji": "🛕"
+    },
+    {
+      "category": "Lord Vishnu",
+      "name": "Dwarkadhish Temple",
+      "lat": 22.2379,
+      "lng": 68.9686,
+      "desc": "A sacred temple dedicated to Lord Krishna, located in Dwarka, Gujarat, part of the Char Dham pilgrimage.",
+      "url": "",
+      "emoji": "🕉️"
+    },
+    {
+      "category": "Lord Vishnu",
+      "name": "Tirupati Balaji Temple",
+      "lat": 13.6833,
+      "lng": 79.3470,
+      "desc": "A famous temple dedicated to Lord Venkateswara, an incarnation of Vishnu, in Tirupati, Andhra Pradesh.",
+      "url": "",
+      "emoji": "🌀"
+    },
+    {
+      "category": "Lord Vishnu",
+      "name": "Ranganathaswamy Temple",
+      "lat": 10.8625,
+      "lng": 78.6900,
+      "desc": "A major Vishnu temple in Srirangam, Tamil Nadu, known for its Dravidian architecture.",
+      "url": "",
+      "emoji": "🛕"
+    },
+  
+    {
+      "category": "Lord Hanuman",
+      "name": "Hanuman Mandir, Connaught Place",
+      "lat": 28.6328,
+      "lng": 77.2195,
+      "desc": "A famous Hanuman temple in Connaught Place, New Delhi, known for its ancient history.",
+      "url": "",
+      "emoji": "🔱"
+    },
+    {
+      "category": "Lord Hanuman",
+      "name": "Hanuman Garhi, Ayodhya",
+      "lat": 26.7956,
+      "lng": 82.1998,
+      "desc": "A significant Hanuman temple in Ayodhya, Uttar Pradesh, located near the Ram Janmabhoomi.",
+      "url": "",
+      "emoji": "🚩"
+    },
+    {
+      "category": "Lord Hanuman",
+      "name": "Sankat Mochan Hanuman Temple",
+      "lat": 25.2900,
+      "lng": 82.9991,
+      "desc": "A revered Hanuman temple in Varanasi, Uttar Pradesh, known for its spiritual significance.",
+      "url": "",
+      "emoji": "🕉️"
+    },
+  
+    {
+      "category": "Lord Ganesha",
+      "name": "Siddhivinayak Temple",
+      "lat": 19.0170,
+      "lng": 72.8302,
+      "desc": "A famous Ganesha temple in Mumbai, Maharashtra, known for its spiritual significance.",
+      "url": "",
+      "emoji": "🛕"
+    },
+    {
+      "category": "Lord Ganesha",
+      "name": "Shree Ganesh Temple, Ranthambore",
+      "lat": 26.0173,
+      "lng": 76.5026,
+      "desc": "A revered Ganesha temple in Ranthambore, Rajasthan, known for the Trinetra Ganesha idol.",
+      "url": "",
+      "emoji": "🕉️"
+    },
+    {
+      "category": "Lord Ganesha",
+      "name": "Dagadusheth Halwai Ganapati Temple",
+      "lat": 18.5164,
+      "lng": 73.8567,
+      "desc": "A famous Ganesha temple in Pune, Maharashtra, known for its grand celebrations during Ganesh Chaturthi.",
+      "url": "",
+      "emoji": "🔱"
+    },
+  
+    {
+      "category": "Other",
+      "name": "Konark Sun Temple",
+      "lat": 19.8874,
+      "lng": 86.0945,
+      "desc": "A 13th-century CE Sun Temple at Konark, Odisha, known for its stunning architecture.",
+      "url": "./map/konarknew.html",
+      "emoji": "☀️"
+    }
+  ]
