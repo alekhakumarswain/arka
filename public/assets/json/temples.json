@@ -6,7 +6,11 @@
       "lng": 91.7055,
       "desc": "A major Shakti Peeth in Guwahati, Assam, dedicated to Goddess Kamakhya.",
       "url": "",
-      "emoji": "🌺"
+      "emoji": "🌺",
+      "country": "India",
+      "state": "Assam",
+      "district": "Kamrup Metropolitan",
+      "religion": "Hinduism"
     },
     {
       "category": "Devi",
@@ -15,7 +19,11 @@
       "lng": 88.3469,
       "desc": "A prominent Shakti Peeth in Kolkata, West Bengal, dedicated to Goddess Kali.",
       "url": "",
-      "emoji": "🔥"
+      "emoji": "🔥",
+      "country": "India",
+      "state": "West Bengal",
+      "district": "Kolkata",
+      "religion": "Hinduism"
     },
     {
       "category": "Devi",
@@ -24,7 +32,11 @@
       "lng": 74.9492,
       "desc": "A revered Shakti Peeth in Katra, Jammu and Kashmir, dedicated to Goddess Vaishno Devi.",
       "url": "",
-      "emoji": "🙏"
+      "emoji": "🙏",
+      "country": "India",
+      "state": "Jammu and Kashmir",
+      "district": "Reasi",
+      "religion": "Hinduism"
     },
     {
       "category": "Devi",
@@ -33,7 +45,11 @@
       "lng": 76.3202,
       "desc": "A Shakti Peeth in Himachal Pradesh, known for its eternal flames, dedicated to Goddess Jwalamukhi.",
       "url": "",
-      "emoji": "🔥"
+      "emoji": "🔥",
+      "country": "India",
+      "state": "Himachal Pradesh",
+      "district": "Kangra",
+      "religion": "Hinduism"
     },
     {
       "category": "Devi",
@@ -42,7 +58,11 @@
       "lng": 72.8491,
       "desc": "A Shakti Peeth in Gujarat, dedicated to Goddess Amba.",
       "url": "",
-      "emoji": "🌺"
+      "emoji": "🌺",
+      "country": "India",
+      "state": "Gujarat",
+      "district": "Banaskantha",
+      "religion": "Hinduism"
     },
     {
       "category": "Devi",
@@ -51,7 +71,11 @@
       "lng": 76.9475,
       "desc": "A Shakti Peeth in Thiruvananthapuram, Kerala, dedicated to Goddess Bhagavathy.",
       "url": "",
-      "emoji": "🙏"
+      "emoji": "🙏",
+      "country": "India",
+      "state": "Kerala",
+      "district": "Thiruvananthapuram",
+      "religion": "Hinduism"
     },
     {
       "category": "Devi",
@@ -60,9 +84,12 @@
       "lng": 81.8887,
       "desc": "A Shakti Peeth in Madhya Pradesh, dedicated to Goddess Naina Devi.",
       "url": "",
-      "emoji": "🏹"
+      "emoji": "🏹",
+      "country": "India",
+      "state": "Madhya Pradesh",
+      "district": "Shahdol",
+      "religion": "Hinduism"
     },
-  
     {
       "category": "Lord Shiva",
       "name": "Kedarnath Temple",
@@ -70,7 +97,11 @@
       "lng": 79.0669,
       "desc": "A sacred Hindu temple dedicated to Lord Shiva, located in the Himalayas, representing the Sky element.",
       "url": "./map/kedarnathtemple.html",
-      "emoji": "🕉️"
+      "emoji": "🕉️",
+      "country": "India",
+      "state": "Uttarakhand",
+      "district": "Rudraprayag",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -79,7 +110,11 @@
       "lng": 79.9067,
       "desc": "A Shiva temple in Telangana, part of the Shiva Shakti Aksh Rekha alignment.",
       "url": "",
-      "emoji": "🔱"
+      "emoji": "🔱",
+      "country": "India",
+      "state": "Telangana",
+      "district": "Karimnagar",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -88,7 +123,11 @@
       "lng": 79.698410,
       "desc": "A Shiva temple in Andhra Pradesh, representing the Air element in the Pancha Bhoota.",
       "url": "",
-      "emoji": "🛕"
+      "emoji": "🛕",
+      "country": "India",
+      "state": "Andhra Pradesh",
+      "district": "Chittoor",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -97,7 +136,11 @@
       "lng": 79.699798,
       "desc": "A Shiva temple in Kanchipuram, Tamil Nadu, representing the Earth element in the Pancha Bhoota.",
       "url": "",
-      "emoji": "🌙"
+      "emoji": "🌙",
+      "country": "India",
+      "state": "Tamil Nadu",
+      "district": "Kanchipuram",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -106,7 +149,11 @@
       "lng": 78.705455,
       "desc": "A Shiva temple in Thiruvanaikaval, Tamil Nadu, representing the Water element in the Pancha Bhoota.",
       "url": "",
-      "emoji": "🔥"
+      "emoji": "🔥",
+      "country": "India",
+      "state": "Tamil Nadu",
+      "district": "Tiruchirappalli",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -115,7 +162,11 @@
       "lng": 79.067694,
       "desc": "A Shiva temple in Thiruvannamalai, Tamil Nadu, representing the Fire element in the Pancha Bhoota.",
       "url": "",
-      "emoji": "🕉️"
+      "emoji": "🕉️",
+      "country": "India",
+      "state": "Tamil Nadu",
+      "district": "Tiruvannamalai",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -124,7 +175,11 @@
       "lng": 79.693559,
       "desc": "A Shiva temple in Chidambaram, Tamil Nadu, representing the Space element in the Pancha Bhoota.",
       "url": "",
-      "emoji": "🛕"
+      "emoji": "🛕",
+      "country": "India",
+      "state": "Tamil Nadu",
+      "district": "Cuddalore",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -133,7 +188,11 @@
       "lng": 79.3174,
       "desc": "A sacred Hindu temple in Rameswaram, Tamil Nadu, dedicated to Lord Shiva, also part of the Char Dham.",
       "url": "./map/ramanathaswamytemple.html",
-      "emoji": "🔱"
+      "emoji": "🔱",
+      "country": "India",
+      "state": "Tamil Nadu",
+      "district": "Ramanathapuram",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -142,7 +201,11 @@
       "lng": 75.5089,
       "desc": "A sacred cave temple in the Himalayas, dedicated to Lord Shiva, known for the natural ice lingam.",
       "url": "./map/amarnathtemple.html",
-      "emoji": "🌙"
+      "emoji": "🌙",
+      "country": "India",
+      "state": "Jammu and Kashmir",
+      "district": "Anantnag",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -151,7 +214,11 @@
       "lng": 70.4011,
       "desc": "A sacred Jyotirlinga temple in Gujarat, dedicated to Lord Shiva.",
       "url": "",
-      "emoji": "🕉️"
+      "emoji": "🕉️",
+      "country": "India",
+      "state": "Gujarat",
+      "district": "Gir Somnath",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Shiva",
@@ -160,9 +227,12 @@
       "lng": 83.0106,
       "desc": "A sacred Jyotirlinga temple in Varanasi, Uttar Pradesh, dedicated to Lord Shiva.",
       "url": "",
-      "emoji": "🛕"
+      "emoji": "🛕",
+      "country": "India",
+      "state": "Uttar Pradesh",
+      "district": "Varanasi",
+      "religion": "Hinduism"
     },
-  
     {
       "category": "Lord Vishnu",
       "name": "Badrinath Temple",
@@ -170,7 +240,11 @@
       "lng": 79.4918,
       "desc": "A holy Hindu temple dedicated to Lord Vishnu, located in the Garhwal Himalayas, part of the Char Dham pilgrimage.",
       "url": "./map/badrinathtemple.html",
-      "emoji": "🌀"
+      "emoji": "🌀",
+      "country": "India",
+      "state": "Uttarakhand",
+      "district": "Chamoli",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Vishnu",
@@ -179,7 +253,11 @@
       "lng": 85.8177,
       "desc": "A famous Hindu temple dedicated to Lord Jagannath, located in Puri, Odisha, known for the annual Rath Yatra festival.",
       "url": "./map/jagannathtemple.html",
-      "emoji": "🛕"
+      "emoji": "🛕",
+      "country": "India",
+      "state": "Odisha",
+      "district": "Puri",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Vishnu",
@@ -188,7 +266,11 @@
       "lng": 68.9686,
       "desc": "A sacred temple dedicated to Lord Krishna, located in Dwarka, Gujarat, part of the Char Dham pilgrimage.",
       "url": "",
-      "emoji": "🕉️"
+      "emoji": "🕉️",
+      "country": "India",
+      "state": "Gujarat",
+      "district": "Devbhoomi Dwarka",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Vishnu",
@@ -197,7 +279,11 @@
       "lng": 79.3470,
       "desc": "A famous temple dedicated to Lord Venkateswara, an incarnation of Vishnu, in Tirupati, Andhra Pradesh.",
       "url": "",
-      "emoji": "🌀"
+      "emoji": "🌀",
+      "country": "India",
+      "state": "Andhra Pradesh",
+      "district": "Chittoor",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Vishnu",
@@ -206,9 +292,12 @@
       "lng": 78.6900,
       "desc": "A major Vishnu temple in Srirangam, Tamil Nadu, known for its Dravidian architecture.",
       "url": "",
-      "emoji": "🛕"
+      "emoji": "🛕",
+      "country": "India",
+      "state": "Tamil Nadu",
+      "district": "Tiruchirappalli",
+      "religion": "Hinduism"
     },
-  
     {
       "category": "Lord Hanuman",
       "name": "Hanuman Mandir, Connaught Place",
@@ -216,7 +305,11 @@
       "lng": 77.2195,
       "desc": "A famous Hanuman temple in Connaught Place, New Delhi, known for its ancient history.",
       "url": "",
-      "emoji": "🔱"
+      "emoji": "🔱",
+      "country": "India",
+      "state": "Delhi",
+      "district": "New Delhi",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Hanuman",
@@ -225,7 +318,11 @@
       "lng": 82.1998,
       "desc": "A significant Hanuman temple in Ayodhya, Uttar Pradesh, located near the Ram Janmabhoomi.",
       "url": "",
-      "emoji": "🚩"
+      "emoji": "🚩",
+      "country": "India",
+      "state": "Uttar Pradesh",
+      "district": "Ayodhya",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Hanuman",
@@ -234,9 +331,12 @@
       "lng": 82.9991,
       "desc": "A revered Hanuman temple in Varanasi, Uttar Pradesh, known for its spiritual significance.",
       "url": "",
-      "emoji": "🕉️"
+      "emoji": "🕉️",
+      "country": "India",
+      "state": "Uttar Pradesh",
+      "district": "Varanasi",
+      "religion": "Hinduism"
     },
-  
     {
       "category": "Lord Ganesha",
       "name": "Siddhivinayak Temple",
@@ -244,7 +344,11 @@
       "lng": 72.8302,
       "desc": "A famous Ganesha temple in Mumbai, Maharashtra, known for its spiritual significance.",
       "url": "",
-      "emoji": "🛕"
+      "emoji": "🛕",
+      "country": "India",
+      "state": "Maharashtra",
+      "district": "Mumbai",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Ganesha",
@@ -253,7 +357,11 @@
       "lng": 76.5026,
       "desc": "A revered Ganesha temple in Ranthambore, Rajasthan, known for the Trinetra Ganesha idol.",
       "url": "",
-      "emoji": "🕉️"
+      "emoji": "🕉️",
+      "country": "India",
+      "state": "Rajasthan",
+      "district": "Sawai Madhopur",
+      "religion": "Hinduism"
     },
     {
       "category": "Lord Ganesha",
@@ -262,9 +370,12 @@
       "lng": 73.8567,
       "desc": "A famous Ganesha temple in Pune, Maharashtra, known for its grand celebrations during Ganesh Chaturthi.",
       "url": "",
-      "emoji": "🔱"
+      "emoji": "🔱",
+      "country": "India",
+      "state": "Maharashtra",
+      "district": "Pune",
+      "religion": "Hinduism"
     },
-  
     {
       "category": "Other",
       "name": "Konark Sun Temple",
@@ -272,6 +383,10 @@
       "lng": 86.0945,
       "desc": "A 13th-century CE Sun Temple at Konark, Odisha, known for its stunning architecture.",
       "url": "./map/konarknew.html",
-      "emoji": "☀️"
+      "emoji": "☀️",
+      "country": "India",
+      "state": "Odisha",
+      "district": "Puri",
+      "religion": "Hinduism"
     }
   ]

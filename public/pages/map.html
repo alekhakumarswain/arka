@@ -6,6 +6,7 @@
   <title>Arka - Satellite Map of India</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /> <!-- Font Awesome for icons -->
   <style>
     body, html {
       margin: 0;
@@ -17,8 +18,9 @@
     }
     #map-container {
       width: 100%;
-      height: 100vh;
+      height: calc(100vh - 56px); /* Default height minus navbar */
       position: relative;
+      top: 56px; /* Default top position below navbar */
     }
     #leaflet-map {
       width: 100%;
@@ -51,6 +53,112 @@
       background: transparent !important;
       border: none !important;
     }
+    #filter-container {
+      background: rgba(0, 0, 0, 0.8); /* Slightly darker for better contrast */
+      position: fixed;
+      width: 100%;
+      top: 56px;
+      z-index: 999;
+      padding: 10px 20px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      flex-wrap: wrap;
+    }
+    #filter-container select,
+    #filter-container input {
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 1rem;
+      color: #333;
+      flex: 1;
+      min-width: 150px;
+      max-width: 200px;
+    }
+    #filter-container input {
+      max-width: 300px;
+    }
+    #filter-container select:focus,
+    #filter-container input:focus {
+      outline: none;
+      box-shadow: 0 0 5px #f59e0b;
+    }
+    #filter-icon {
+      display: none; /* Hidden by default, shown in mobile view */
+      position: fixed;
+      top: 70px;
+      left: 10px;
+      z-index: 1000;
+      background: #f59e0b;
+      color: white;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    #close-filter {
+      display: none; /* Hidden by default, shown when filter is open */
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #f59e0b;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      #filter-container {
+        display: none; /* Hidden by default in mobile view */
+        flex-direction: column;
+        align-items: stretch;
+        width: 250px; /* Fixed width for sidebar */
+        height: calc(100vh - 56px); /* Full height minus navbar */
+        top: 56px;
+        left: -250px; /* Hidden off-screen to the left */
+        transition: left 0.3s ease; /* Smooth transition for GSAP */
+      }
+      #filter-container.active {
+        display: flex; /* Show when active */
+        left: 0; /* Slide in */
+      }
+      #filter-container select,
+      #filter-container input {
+        max-width: 100%;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+      }
+      #close-filter {
+        display: block; /* Show close icon in mobile view */
+      }
+      #filter-icon {
+        display: block; /* Show filter icon in mobile view */
+      }
+      #map-container {
+        top: 56px; /* Map stays directly below navbar */
+        height: calc(100vh - 56px); /* Full height minus navbar */
+      }
+    }
+
+    @media (max-width: 576px) {
+      .navbar-brand {
+        font-size: 1.5rem;
+      }
+      .nav-link {
+        font-size: 0.9rem;
+      }
+      #filter-container {
+        width: 200px; /* Smaller width for very small screens */
+        left: -200px;
+      }
+      #filter-container.active {
+        left: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -73,42 +181,188 @@
     </div>
   </nav>
 
+  <!-- Filter Icon for Mobile View -->
+  <div id="filter-icon">
+    <i class="fas fa-filter"></i>
+  </div>
+
+  <!-- Filter Container -->
+  <div id="filter-container">
+    <div id="close-filter">
+      <i class="fas fa-times"></i>
+    </div>
+    <select id="country-filter">
+      <option value="">All Countries</option>
+      <option value="India">India</option>
+    </select>
+    <select id="state-filter">
+      <option value="">All States</option>
+      <!-- States will be populated dynamically -->
+    </select>
+    <select id="district-filter">
+      <option value="">All Districts</option>
+      <!-- Districts will be populated dynamically -->
+    </select>
+    <select id="religion-filter">
+      <option value="">All Religions</option>
+      <option value="Hinduism">Hinduism</option>
+    </select>
+    <input type="text" id="search-input" placeholder="Search temples..." />
+  </div>
+
   <div id="map-container">
     <div id="leaflet-map"></div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script> <!-- GSAP -->
 
   <script>
     // Initialize Leaflet Map with ArcGIS World Imagery, centered on India
-    const map = L.map('leaflet-map').setView([22.5937, 79.9629], 5); // Center on India
+    const map = L.map('leaflet-map', {
+      zoomControl: false // Disable zoom control (+ and - buttons)
+    }).setView([22.5937, 79.9629], 5); // Center on India
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Powered by ARKA',
       maxZoom: 19,
     }).addTo(map);
 
+    let allLocations = [];
+    let markers = [];
+
+    // Function to clear existing markers
+    function clearMarkers() {
+      markers.forEach(marker => map.removeLayer(marker));
+      markers = [];
+    }
+
+    // Function to add markers to the map
+    function addMarkers(locations) {
+      clearMarkers();
+      locations.forEach(location => {
+        const customEmojiIcon = L.divIcon({
+          html: `<span style="font-size: 24px; background: transparent;">${location.emoji}</span>`,
+          iconSize: [24, 24],
+          iconAnchor: [12, 24],
+          popupAnchor: [0, -24],
+          className: 'custom-div-icon'
+        });
+
+        const marker = L.marker([location.lat, location.lng], { icon: customEmojiIcon }).addTo(map);
+        marker.bindPopup(`
+          <h3 style="color: #f59e0b;">${location.name}</h3>
+          <p>${location.desc}</p>
+          ${location.url ? `<a href="${location.url}" target="_blank" style="display: inline-block; background: #f59e0b; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">Visit</a>` : `<p style="color: #f59e0b;">Popup Coming Soon</p>`}
+        `);
+        markers.push(marker);
+      });
+    }
+
+    // Function to populate filter dropdowns dynamically
+    function populateFilters(locations) {
+      const states = [...new Set(locations.map(loc => loc.state))].sort();
+      const districts = [...new Set(locations.map(loc => loc.district))].sort();
+      const religions = [...new Set(locations.map(loc => loc.religion))].sort();
+
+      const stateFilter = document.getElementById('state-filter');
+      const districtFilter = document.getElementById('district-filter');
+      const religionFilter = document.getElementById('religion-filter');
+
+      states.forEach(state => {
+        const option = document.createElement('option');
+        option.value = state;
+        option.textContent = state;
+        stateFilter.appendChild(option);
+      });
+
+      districts.forEach(district => {
+        const option = document.createElement('option');
+        option.value = district;
+        option.textContent = district;
+        districtFilter.appendChild(option);
+      });
+
+      religions.forEach(religion => {
+        const option = document.createElement('option');
+        option.value = religion;
+        option.textContent = religion;
+        religionFilter.appendChild(option);
+      });
+    }
+
+    // Function to filter locations based on user input
+    function filterLocations() {
+      const country = document.getElementById('country-filter').value;
+      const state = document.getElementById('state-filter').value;
+      const district = document.getElementById('district-filter').value;
+      const religion = document.getElementById('religion-filter').value;
+      const search = document.getElementById('search-input').value.toLowerCase();
+
+      let filteredLocations = allLocations;
+
+      if (country) {
+        filteredLocations = filteredLocations.filter(loc => loc.country === country);
+      }
+      if (state) {
+        filteredLocations = filteredLocations.filter(loc => loc.state === state);
+      }
+      if (district) {
+        filteredLocations = filteredLocations.filter(loc => loc.district === district);
+      }
+      if (religion) {
+        filteredLocations = filteredLocations.filter(loc => loc.religion === religion);
+      }
+      if (search) {
+        filteredLocations = filteredLocations.filter(loc =>
+          loc.name.toLowerCase().includes(search) ||
+          loc.desc.toLowerCase().includes(search) ||
+          loc.category.toLowerCase().includes(search)
+        );
+      }
+
+      addMarkers(filteredLocations);
+    }
+
+    // GSAP Animations for Filter Bar in Mobile View
+    const filterContainer = document.getElementById('filter-container');
+    const filterIcon = document.getElementById('filter-icon');
+    const closeFilter = document.getElementById('close-filter');
+
+    filterIcon.addEventListener('click', () => {
+      filterContainer.classList.add('active');
+      gsap.to(filterContainer, {
+        left: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+      });
+    });
+
+    closeFilter.addEventListener('click', () => {
+      gsap.to(filterContainer, {
+        left: -250, // Adjust based on width (250px for >576px, 200px for <576px)
+        duration: 0.3,
+        ease: 'power2.in',
+        onComplete: () => {
+          filterContainer.classList.remove('active');
+        }
+      });
+    });
+
     // Fetch the temples data from the JSON file
     fetch('../assets/json/temples.json')
       .then(response => response.json())
       .then(locations => {
-        // Add markers with specific emoji icons to the map
-        locations.forEach(location => {
-          const customEmojiIcon = L.divIcon({
-            html: `<span style="font-size: 24px; background: transparent;">${location.emoji}</span>`,
-            iconSize: [24, 24], // Reduced size to prevent overlap
-            iconAnchor: [12, 24], // Adjusted anchor for smaller size
-            popupAnchor: [0, -24], // Adjusted popup position
-            className: 'custom-div-icon' // Ensure transparent background
-          });
+        allLocations = locations;
+        populateFilters(locations);
+        addMarkers(locations);
 
-          const marker = L.marker([location.lat, location.lng], { icon: customEmojiIcon }).addTo(map);
-          marker.bindPopup(`
-            <h3 style="color: #f59e0b;">${location.name}</h3>
-            <p>${location.desc}</p>
-            ${location.url ? `<a href="${location.url}" target="_blank" style="display: inline-block; background: #f59e0b; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">Visit</a>` : `<p style="color: #f59e0b;">Popup Coming Soon</p>`}
-          `);
-        });
+        // Add event listeners for filters
+        document.getElementById('country-filter').addEventListener('change', filterLocations);
+        document.getElementById('state-filter').addEventListener('change', filterLocations);
+        document.getElementById('district-filter').addEventListener('change', filterLocations);
+        document.getElementById('religion-filter').addEventListener('change', filterLocations);
+        document.getElementById('search-input').addEventListener('input', filterLocations);
       })
       .catch(error => {
         console.error('Error fetching temples data:', error);
