@@ -201,13 +201,13 @@
         const size = box.getSize(new THREE.Vector3());
         
         model.position.set(
-          landmarks[0].x - center.x,
-          -center.y-3.5 + size.y/2, // Place on top of platform
-          landmarks[0].z - center.z
+          landmarks[0].x+19 - center.x,
+          -center.y-7.3 + size.y/2, // Place on top of platform
+          landmarks[0].z- - center.z
         );
         
         // Scale the model
-        const scale = 10;
+        const scale = 40;
         model.scale.set(scale, scale, scale);
         
         // Rotate to face forward
