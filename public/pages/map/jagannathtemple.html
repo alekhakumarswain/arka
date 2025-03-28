@@ -137,8 +137,8 @@
     // Orbit Controls
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.minDistance = 5;
+    controls.dampingFactor = 1.15;
+    controls.minDistance = 0.5;
     controls.maxDistance = 100;
     controls.maxPolarAngle = Math.PI / 2;
 
@@ -157,9 +157,9 @@
     scene.add(hemisphereLight);
 
     // Terrain
-    const terrainGeometry = new THREE.PlaneGeometry(200, 200, 100, 100);
+    const terrainGeometry = new THREE.PlaneGeometry(800, 800, 400, 100);
     const terrainMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x85a0d5,
+      color: 0xBC8A57,
       roughness: 0.8,
       metalness: 0.2
     });
@@ -182,18 +182,7 @@
     terrainGeometry.attributes.position.needsUpdate = true;
     terrainGeometry.computeVertexNormals();
 
-    // Platform for the temple
-    const platformGeometry = new THREE.CylinderGeometry(15, 15, 0.5, 32);
-    const platformMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xdddddd,
-      roughness: 0.7,
-      metalness: 0.3
-    });
-    const platform = new THREE.Mesh(platformGeometry, platformMaterial);
-    platform.position.set(0, 0, 0);
-    platform.rotation.x = Math.PI / 2;
-    platform.receiveShadow = true;
-    scene.add(platform);
+
 
     // Landmarks
     const landmarks = [{ name: "Konark Sun Temple", x: 0, z: 0 }];
