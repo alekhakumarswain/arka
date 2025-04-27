@@ -185,11 +185,11 @@
 
 
     // Landmarks
-    const landmarks = [{ name: "Konark Sun Temple", x: 0, z: 0 }];
+    const landmarks = [{ name: "Jagannath Temple", x: 0, z: 0 }];
     const landmarkMeshes = [];
     const gltfLoader = new THREE.GLTFLoader();
 
-    // Load the Konark Sun Temple model
+    // Load the Jagannath Temple model
     gltfLoader.load(
       '../../assets/models/temples/jagannathtempleonsand.glb',
       (gltf) => {
@@ -238,7 +238,7 @@
       },
       (xhr) => {
         const percentLoaded = (xhr.loaded / xhr.total * 100);
-        loadingElement.textContent = `Loading Konark Temple... ${Math.round(percentLoaded)}%`;
+        loadingElement.textContent = `Loading Jagannath Temple... ${Math.round(percentLoaded)}%`;
       },
       (error) => {
         console.error('Error loading temple model:', error);
