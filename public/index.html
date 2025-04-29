@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arka - Smart Tourism App</title>
   <!-- Bootstrap CSS (CDN) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <!-- Animate.css (CDN) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
   <style>
     body, html {
       margin: 0;
       padding: 0;
       height: auto;
-      background: linear-gradient(135deg, #1a3c34 0%, #d97706 100%); /* Odisha-inspired: forest green to saffron sunset */
+      background: linear-gradient(135deg, #1a3c34 0%, #d97706 100%);
       color: white;
       font-family: 'Arial', sans-serif;
       scroll-behavior: smooth;
@@ -47,7 +47,7 @@
     .navbar-brand {
       font-size: 2rem;
       font-weight: bold;
-      color: #f59e0b !important; /* Saffron/gold for Odisha culture */
+      color: #f59e0b !important;
       text-transform: uppercase;
     }
 
@@ -81,7 +81,7 @@
       font-weight: 700;
       margin-bottom: 1rem;
       text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
-      background: linear-gradient(90deg, #f59e0b, #b91c1c); /* Saffron to red for Odisha vibrancy */
+      background: linear-gradient(90deg, #f59e0b, #b91c1c);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -103,7 +103,7 @@
     }
 
     .content-section h2 {
-      color: #f59e0b; /* Saffron/gold */
+      color: #f59e0b;
       font-size: 2.5rem;
       font-weight: 700;
       margin-top: 3rem;
@@ -113,7 +113,7 @@
     }
 
     .content-section h3 {
-      color: #b91c1c; /* Red for Odisha vibrancy */
+      color: #b91c1c;
       font-size: 1.8rem;
       font-weight: 600;
       margin-top: 2rem;
@@ -145,7 +145,7 @@
     }
 
     .content-section ul li:before {
-      content: "🛕"; /* Temple icon for Odisha culture */
+      content: "🛕";
       color: #f59e0b;
       position: absolute;
       left: 0;
@@ -189,12 +189,8 @@
   </style>
 </head>
 <body>
-  <!-- 3D Scene Container -->
   <div id="scene-container"></div>
-
-  <!-- Overlay with Navigation and Content -->
   <div id="overlay">
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container">
         <a class="navbar-brand" href="#">Arka</a>
@@ -210,19 +206,17 @@
             <li class="nav-item"><a class="nav-link" href="./pages/profile.html">Profile</a></li>
             <li class="nav-item"><a class="nav-link" href="./pages/booking.html">Book Tickets</a></li>
             <li class="nav-item"><a class="nav-link" href="./Auth.html">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="./pages/map.html">Map</a></li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <!-- Welcome Section -->
     <div class="welcome-section">
       <h1 class="animate__animated animate__fadeIn">Welcome to Arka</h1>
       <p class="animate__animated animate__fadeIn animate__delay-1s">Explore Odisha’s Cultural Wonders with Arka</p>
     </div>
 
-    <!-- App Features Section -->
-    < swallowing the content-section -->
     <div class="content-section">
       <div class="container">
         <h2>🛕 Arka Features</h2>
@@ -296,14 +290,11 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Inline JavaScript -->
   <script>
-    // Scene setup
     const container = document.getElementById('scene-container');
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -311,34 +302,28 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
-    // Background
-    scene.background = new THREE.Color(0x1a3c34); // Forest green for Odisha landscapes
+    scene.background = new THREE.Color(0x1a3c34);
 
-    // Globe (Central Sphere with Texture)
     const globeGeometry = new THREE.SphereGeometry(1.5, 32, 32);
     const globeTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
     const globeMaterial = new THREE.MeshPhongMaterial({ map: globeTexture });
     const globe = new THREE.Mesh(globeGeometry, globeMaterial);
     scene.add(globe);
 
-    // Odisha Pattern Ring (Inspired by traditional designs)
     const ringGeometry = new THREE.TorusGeometry(2, 0.05, 16, 100, Math.PI * 2);
-    const ringMaterial = new THREE.MeshPhongMaterial({ color: 0xf59e0b, emissive: 0xb91c1c }); // Saffron with red glow
+    const ringMaterial = new THREE.MeshPhongMaterial({ color: 0xf59e0b, emissive: 0xb91c1c });
     const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-    ring.rotation.x = Math.PI / 2; // Rotate to lie flat
+    ring.rotation.x = Math.PI / 2;
     scene.add(ring);
 
-    // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
     const pointLight = new THREE.PointLight(0xffffff, 1);
     pointLight.position.set(10, 10, 10);
     scene.add(pointLight);
 
-    // Camera position
     camera.position.z = 5;
 
-    // GSAP Animations
     gsap.to(globe.rotation, {
       y: Math.PI * 2,
       duration: 20,
@@ -352,7 +337,6 @@
       ease: 'none',
     });
 
-    // Mouse Interaction
     let mouseX = 0, mouseY = 0;
     document.addEventListener('mousemove', (e) => {
       mouseX = (e.clientX / window.innerWidth) * 2 - 1;
@@ -364,7 +348,6 @@
       });
     });
 
-    // Click Interaction (Zoom on Click)
     document.addEventListener('click', () => {
       gsap.to(camera.position, {
         z: camera.position.z === 5 ? 3 : 5,
@@ -373,14 +356,12 @@
       });
     });
 
-    // Render loop
     function animate() {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     }
     animate();
 
-    // Resize handling
     window.addEventListener('resize', () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
