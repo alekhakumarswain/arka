@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arka - Events</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body { background: #1a1a3d; color: white; }
     .navbar { background: rgba(0, 0, 0, 0.6); }
@@ -37,32 +37,127 @@
   </nav>
 
   <div class="container mt-5">
-    <h1 class="text-center mb-4">Cultural Events & Shopping</h1>
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card text-white p-3">
-          <h5>Puri Rath Yatra</h5>
-          <p>Date: July 2025 | Location: Puri</p>
-          <button class="btn btn-primary">Book Event Pass</button>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card text-white p-3">
-          <h5>Konark Festival</h5>
-          <p>Date: Dec 2025 | Odissi Dance</p>
-          <button class="btn btn-outline-light">Get Tickets</button>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card text-white p-3">
-          <h5>Handicraft Fair</h5>
-          <p>Shop Pattachitra & Silver Filigree</p>
-          <button class="btn btn-outline-light">Explore Artisans</button>
-        </div>
-      </div>
+    <h1 class="text-center mb-4">Cultural Events</h1>
+    <div class="row" id="events-container">
+      <!-- Dynamic cultural event cards will be inserted here -->
+    </div>
+
+    <h1 class="text-center my-4">Shopping Events</h1>
+    <div class="row" id="shopping-container">
+      <!-- Dynamic shopping event cards will be inserted here -->
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sample shopping events data (since no shopping data in data.json)
+    const shoppingEvents = [
+      {
+        name: "Handicraft Fair",
+        date: "2025-11-10",
+        time: "10:00 AM - 08:00 PM",
+        location: "Bhubaneswar Exhibition Center",
+        ticket_price: "Free",
+        button_text: "Explore Artisans"
+      },
+      {
+        name: "Pattachitra Art Expo",
+        date: "2025-12-05",
+        time: "09:00 AM - 07:00 PM",
+        location: "Puri Art Gallery",
+        ticket_price: "INR 100",
+        button_text: "Get Tickets"
+      },
+      {
+        name: "Silver Filigree Showcase",
+        date: "2025-12-20",
+        time: "11:00 AM - 06:00 PM",
+        location: "Cuttack Craft Market",
+        ticket_price: "Free",
+        button_text: "Visit Market"
+      }
+    ];
+
+    // Fetch events data from data.json and render event cards
+    fetch('../assets/json/data.json')
+      .then(response => response.json())
+      .then(data => {
+        const events = data.events;
+        const eventsContainer = document.getElementById('events-container');
+
+        for (const eventId in events) {
+          if (events.hasOwnProperty(eventId)) {
+            const event = events[eventId];
+
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-md-4 mb-4';
+
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card text-white p-3 h-100 d-flex flex-column justify-content-between';
+
+            const title = document.createElement('h5');
+            title.textContent = event.name;
+            cardDiv.appendChild(title);
+
+            const dateTime = document.createElement('p');
+            dateTime.textContent = `Date: ${event.date} | Time: ${event.time}`;
+            cardDiv.appendChild(dateTime);
+
+            const location = document.createElement('p');
+            location.textContent = `Location: ${event.location}`;
+            cardDiv.appendChild(location);
+
+            const ticketPrice = document.createElement('p');
+            ticketPrice.textContent = `Ticket Price: ${event.ticket_price}`;
+            cardDiv.appendChild(ticketPrice);
+
+            const button = document.createElement('button');
+            button.className = 'btn btn-primary mt-auto';
+            button.textContent = event.ticket_price.toLowerCase() === 'free' ? 'Join Event' : 'Book Event Pass';
+            cardDiv.appendChild(button);
+
+            colDiv.appendChild(cardDiv);
+            eventsContainer.appendChild(colDiv);
+          }
+        }
+
+        // Render shopping events
+        const shoppingContainer = document.getElementById('shopping-container');
+        shoppingEvents.forEach(event => {
+          const colDiv = document.createElement('div');
+          colDiv.className = 'col-md-4 mb-4';
+
+          const cardDiv = document.createElement('div');
+          cardDiv.className = 'card text-white p-3 h-100 d-flex flex-column justify-content-between';
+
+          const title = document.createElement('h5');
+          title.textContent = event.name;
+          cardDiv.appendChild(title);
+
+          const dateTime = document.createElement('p');
+          dateTime.textContent = `Date: ${event.date} | Time: ${event.time}`;
+          cardDiv.appendChild(dateTime);
+
+          const location = document.createElement('p');
+          location.textContent = `Location: ${event.location}`;
+          cardDiv.appendChild(location);
+
+          const ticketPrice = document.createElement('p');
+          ticketPrice.textContent = `Ticket Price: ${event.ticket_price}`;
+          cardDiv.appendChild(ticketPrice);
+
+          const button = document.createElement('button');
+          button.className = 'btn btn-outline-light mt-auto';
+          button.textContent = event.button_text;
+          cardDiv.appendChild(button);
+
+          colDiv.appendChild(cardDiv);
+          shoppingContainer.appendChild(colDiv);
+        });
+      })
+      .catch(error => {
+        console.error('Error loading events data:', error);
+      });
+  </script>
 </body>
 </html>
