@@ -238,12 +238,15 @@
       const authLink = document.getElementById('authLink');
       const errorElement = document.getElementById('errorMessage');
       if (user) {
+        console.log('User logged in:', user);
         authLink.textContent = 'Logout';
         authLink.href = '#';
         authLink.onclick = logout;
         try {
           // Fetch and display user profile
+          console.log('Fetching profile for user ID:', user.uid);
           const profile = await getUserProfile(user.uid);
+          console.log('Profile data fetched:', profile);
           if (profile) {
             document.getElementById('userInfo').innerHTML = `
               Name: ${profile.name}<br>
@@ -269,6 +272,7 @@
           // Placeholder for future data (Saved Places, Trekking History, Event Bookings)
           // These can be implemented with Firestore collections like arka/users/{uid}/saved_places
         } catch (error) {
+          console.error('Error fetching profile or bookings:', error);
           errorElement.textContent = error.message;
         }
       } else {

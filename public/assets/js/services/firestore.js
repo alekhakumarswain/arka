@@ -4,7 +4,7 @@ import { doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, getDo
 // Get user profile
 export async function getUserProfile(userId) {
   try {
-    const userDoc = await getDoc(doc(db, 'arka', 'users', userId, 'profile'));
+    const userDoc = await getDoc(doc(db, 'arka_users', userId));
     return userDoc.exists() ? userDoc.data() : null;
   } catch (error) {
     throw new Error(error.message);
@@ -14,7 +14,7 @@ export async function getUserProfile(userId) {
 // Update user profile
 export async function updateUserProfile(userId, data) {
   try {
-    await updateDoc(doc(db, 'arka', 'users', userId, 'profile'), data);
+    await updateDoc(doc(db, 'arka_users', userId), data);
   } catch (error) {
     throw new Error(error.message);
   }

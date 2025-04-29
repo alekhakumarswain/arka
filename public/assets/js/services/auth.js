@@ -22,10 +22,11 @@ export async function signupWithEmail(name, email, phone, password) {
     await user.updateProfile({ displayName: name });
     
     // Save additional user info to Firestore
-    await setDoc(doc(db, 'arka', 'users', user.uid, 'profile'), {
+    await setDoc(doc(db, 'arka_users', user.uid), {
       name,
       email,
       phone,
+      photoURL: user.photoURL || '',
       join_date: new Date()
     });
     
@@ -43,10 +44,11 @@ export async function signInWithGoogle() {
     const user = userCredential.user;
     
     // Save user info to Firestore if new user
-    await setDoc(doc(db, 'arka', 'users', user.uid, 'profile'), {
+    await setDoc(doc(db, 'arka_users', user.uid), {
       name: user.displayName,
       email: user.email,
       phone: user.phoneNumber || '',
+      photoURL: user.photoURL || '',
       join_date: new Date()
     }, { merge: true });
     
