@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arka - Trekking</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body { background: #1a1a3d; color: white; }
     .navbar { background: rgba(0, 0, 0, 0.6); }
@@ -38,31 +38,55 @@
 
   <div class="container mt-5">
     <h1 class="text-center mb-4">Trekking Adventures</h1>
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card text-white p-3">
-          <h5>Daringbadi Hills</h5>
-          <p>Difficulty: Medium | Weather: Clear</p>
-          <button class="btn btn-primary">View Trail Map</button>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card text-white p-3">
-          <h5>Coastal Trail</h5>
-          <p>Difficulty: Easy | Weather: Sunny</p>
-          <button class="btn btn-outline-light">Join Group</button>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card text-white p-3">
-          <h5>Safety Alerts</h5>
-          <p>No current alerts.</p>
-          <button class="btn btn-outline-light">Check Updates</button>
-        </div>
-      </div>
+    <div class="row" id="trekking-container">
+      <!-- Dynamic trekking route cards will be inserted here -->
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Fetch trekking routes data from data.json and render trekking cards
+    fetch('../assets/json/data.json')
+      .then(response => response.json())
+      .then(data => {
+        const trekkingRoutes = data.trekking_routes;
+        const trekkingContainer = document.getElementById('trekking-container');
+
+        for (const trekId in trekkingRoutes) {
+          if (trekkingRoutes.hasOwnProperty(trekId)) {
+            const trek = trekkingRoutes[trekId];
+
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-md-4 mb-4';
+
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card text-white p-3 h-100 d-flex flex-column justify-content-between';
+
+            const title = document.createElement('h5');
+            title.textContent = trek.name;
+            cardDiv.appendChild(title);
+
+            const details = document.createElement('p');
+            details.textContent = `District: ${trek.district} | Difficulty: ${trek.difficulty} | Distance: ${trek.distance_km} km`;
+            cardDiv.appendChild(details);
+
+            const weather = document.createElement('p');
+            weather.textContent = `Weather Advice: ${trek.weather_advice}`;
+            cardDiv.appendChild(weather);
+
+            const button = document.createElement('button');
+            button.className = 'btn btn-primary mt-auto';
+            button.textContent = 'View Trail Map';
+            cardDiv.appendChild(button);
+
+            colDiv.appendChild(cardDiv);
+            trekkingContainer.appendChild(colDiv);
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error loading trekking data:', error);
+      });
+  </script>
 </body>
 </html>
