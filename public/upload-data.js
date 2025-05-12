@@ -1,0 +1,1163 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, collection, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDkYJtwm9mqrq2zFIIr0DXElYG44WIpswI",
+  authDomain: "arka-5258.firebaseapp.com",
+  databaseURL: "https://arka-5258-default-rtdb.firebaseio.com",
+  projectId: "arka-5258",
+  storageBucket: "arka-5258.firebasestorage.app",
+  messagingSenderId: "378365125891",
+  appId: "1:378365125891:web:43e9ca1df58152d9f8b536",
+  measurementId: "G-2V7TSEBWQ8"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Data from data.json (same as provided)
+const data = {
+  "users": {
+    "userId1": {
+      "name": "Amit Sahoo",
+      "email": "amit.sahoo@example.com",
+      "phone": "+919876543210",
+      "address": "Jaydev Vihar, Bhubaneswar",
+      "saved_routes": ["routeId1"],
+      "bookings": ["bookingId1"],
+      "preferences": {
+        "language": "Odia",
+        "theme": "Light",
+        "notifications": "On"
+      },
+      "travel_history": [
+        {
+          "bookingId": "bookingId1",
+          "date": "2025-03-20",
+          "destination": "Puri"
+        }
+      ],
+      "total_spent": 500,
+      "join_date": "2025-01-15"
+    },
+    "userId2": {
+      "name": "Priya Das",
+      "email": "priya.das@example.com",
+      "phone": "+919123456789",
+      "address": "Nayapalli, Bhubaneswar",
+      "saved_routes": ["routeId2"],
+      "bookings": ["bookingId2"],
+      "preferences": {
+        "language": "English",
+        "theme": "Dark"
+      },
+      "travel_history": [
+        {
+          "bookingId": "bookingId2",
+          "date": "2025-03-21",
+          "destination": "Konark"
+        }
+      ],
+      "total_spent": 700,
+      "join_date": "2025-02-01"
+    },
+    "userId3": {
+      "name": "Rakesh Mohanty",
+      "email": "rakesh.m@example.com",
+      "phone": "+919234567890",
+      "address": "Badagada, Cuttack",
+      "saved_routes": ["routeId3"],
+      "bookings": ["bookingId3"],
+      "preferences": {
+        "language": "Odia",
+        "theme": "Light"
+      },
+      "travel_history": [
+        {
+          "bookingId": "bookingId3",
+          "date": "2025-03-22",
+          "destination": "Daringbadi"
+        }
+      ],
+      "total_spent": 1200,
+      "join_date": "2025-02-10"
+    },
+    "userId4": {
+      "name": "Suman Patra",
+      "email": "suman.patra@example.com",
+      "phone": "+919345678901",
+      "address": "Gopalpur, Puri",
+      "saved_routes": ["routeId4"],
+      "bookings": ["bookingId4"],
+      "preferences": {
+        "language": "Hindi",
+        "theme": "Dark"
+      },
+      "travel_history": [
+        {
+          "bookingId": "bookingId4",
+          "date": "2025-03-23",
+          "destination": "Berhampur"
+        }
+      ],
+      "total_spent": 600,
+      "join_date": "2025-03-01"
+    },
+    "userId5": {
+      "name": "Laxmi Nayak",
+      "email": "laxmi.nayak@example.com",
+      "phone": "+919456789012",
+      "address": "Salipur, Cuttack",
+      "saved_routes": ["routeId5"],
+      "bookings": ["bookingId5"],
+      "preferences": {
+        "language": "English",
+        "theme": "Light"
+      },
+      "travel_history": [
+        {
+          "bookingId": "bookingId5",
+          "date": "2025-03-24",
+          "destination": "Bhubaneswar"
+        }
+      ],
+      "total_spent": 400,
+      "join_date": "2025-03-10"
+    }
+  },
+  "buses": {
+    "busId1": {
+      "route": "Bhubaneswar - Puri",
+      "current_location": {
+        "lat": 20.2961,
+        "lng": 85.8245
+      },
+      "seats_available": 15,
+      "total_seats": 40,
+      "driver": {
+        "name": "Suresh Behera",
+        "phone": "+919876123456"
+      },
+      "conductor": {
+        "name": "Manoj Jena",
+        "phone": "+919876543211"
+      },
+      "live_status": "On Route",
+      "trip_frequency": {
+        "A_to_B": 4,
+        "B_to_A": 4
+      },
+      "schedule": [
+        {
+          "direction": "A_to_B",
+          "departure": "07:00 AM",
+          "arrival": "08:30 AM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "09:00 AM",
+          "arrival": "10:30 AM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "12:00 PM",
+          "arrival": "01:30 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "02:00 PM",
+          "arrival": "03:30 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "04:00 PM",
+          "arrival": "05:30 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "06:00 PM",
+          "arrival": "07:30 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "08:00 PM",
+          "arrival": "09:30 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "10:00 PM",
+          "arrival": "11:30 PM"
+        }
+      ],
+      "travel_history": [
+        {
+          "date": "2025-03-20",
+          "seats_booked": 25,
+          "passengers": ["userId1"],
+          "revenue": 12500
+        }
+      ],
+      "total_revenue": 12500
+    },
+    "busId2": {
+      "route": "Cuttack - Konark",
+      "current_location": {
+        "lat": 20.4625,
+        "lng": 85.8830
+      },
+      "seats_available": 10,
+      "total_seats": 35,
+      "driver": {
+        "name": "Ramesh Pradhan",
+        "phone": "+919654321987"
+      },
+      "conductor": {
+        "name": "Bijay Das",
+        "phone": "+919654321988"
+      },
+      "live_status": "Departing Soon",
+      "trip_frequency": {
+        "A_to_B": 3,
+        "B_to_A": 3
+      },
+      "schedule": [
+        {
+          "direction": "A_to_B",
+          "departure": "08:00 AM",
+          "arrival": "10:00 AM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "10:30 AM",
+          "arrival": "12:30 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "02:00 PM",
+          "arrival": "04:00 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "04:30 PM",
+          "arrival": "06:30 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "07:00 PM",
+          "arrival": "09:00 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "09:30 PM",
+          "arrival": "11:30 PM"
+        }
+      ],
+      "travel_history": [
+        {
+          "date": "2025-03-21",
+          "seats_booked": 25,
+          "passengers": ["userId2"],
+          "revenue": 12500
+        }
+      ],
+      "total_revenue": 12500
+    },
+    "busId3": {
+      "route": "Bhubaneswar - Daringbadi",
+      "current_location": {
+        "lat": 20.2961,
+        "lng": 85.8245
+      },
+      "seats_available": 20,
+      "total_seats": 45,
+      "driver": {
+        "name": "Kishore Rout",
+        "phone": "+919765432109"
+      },
+      "conductor": {
+        "name": "Santosh Swain",
+        "phone": "+919765432110"
+      },
+      "live_status": "On Route",
+      "trip_frequency": {
+        "A_to_B": 2,
+        "B_to_A": 2
+      },
+      "schedule": [
+        {
+          "direction": "A_to_B",
+          "departure": "06:00 AM",
+          "arrival": "12:00 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "01:00 PM",
+          "arrival": "07:00 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "03:00 PM",
+          "arrival": "09:00 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "10:00 PM",
+          "arrival": "04:00 AM"
+        }
+      ],
+      "travel_history": [
+        {
+          "date": "2025-03-22",
+          "seats_booked": 25,
+          "passengers": ["userId3"],
+          "revenue": 30000
+        }
+      ],
+      "total_revenue": 30000
+    },
+    "busId4": {
+      "route": "Puri - Berhampur",
+      "current_location": {
+        "lat": 19.8047,
+        "lng": 85.8181
+      },
+      "seats_available": 12,
+      "total_seats": 50,
+      "driver": {
+        "name": "Hari Sethi",
+        "phone": "+919876543222"
+      },
+      "conductor": {
+        "name": "Gopal Panda",
+        "phone": "+919876543223"
+      },
+      "live_status": "At Depot",
+      "trip_frequency": {
+        "A_to_B": 3,
+        "B_to_A": 3
+      },
+      "schedule": [
+        {
+          "direction": "A_to_B",
+          "departure": "07:30 AM",
+          "arrival": "11:30 AM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "12:00 PM",
+          "arrival": "04:00 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "02:00 PM",
+          "arrival": "06:00 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "06:30 PM",
+          "arrival": "10:30 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "09:00 PM",
+          "arrival": "01:00 AM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "01:30 AM",
+          "arrival": "05:30 AM"
+        }
+      ],
+      "travel_history": [
+        {
+          "date": "2025-03-23",
+          "seats_booked": 38,
+          "passengers": ["userId4"],
+          "revenue": 22800
+        }
+      ],
+      "total_revenue": 22800
+    },
+    "busId5": {
+      "route": "Cuttack - Bhubaneswar",
+      "current_location": {
+        "lat": 20.4625,
+        "lng": 85.8830
+      },
+      "seats_available": 18,
+      "total_seats": 30,
+      "driver": {
+        "name": "Dilip Nayak",
+        "phone": "+919876543234"
+      },
+      "conductor": {
+        "name": "Anil Mohapatra",
+        "phone": "+919876543235"
+      },
+      "live_status": "Arrived",
+      "trip_frequency": {
+        "A_to_B": 6,
+        "B_to_A": 6
+      },
+      "schedule": [
+        {
+          "direction": "A_to_B",
+          "departure": "06:00 AM",
+          "arrival": "06:45 AM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "07:00 AM",
+          "arrival": "07:45 AM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "09:00 AM",
+          "arrival": "09:45 AM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "10:00 AM",
+          "arrival": "10:45 AM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "01:00 PM",
+          "arrival": "01:45 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "02:00 PM",
+          "arrival": "02:45 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "04:00 PM",
+          "arrival": "04:45 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "05:00 PM",
+          "arrival": "05:45 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "07:00 PM",
+          "arrival": "07:45 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "08:00 PM",
+          "arrival": "08:45 PM"
+        },
+        {
+          "direction": "A_to_B",
+          "departure": "10:00 PM",
+          "arrival": "10:45 PM"
+        },
+        {
+          "direction": "B_to_A",
+          "departure": "11:00 PM",
+          "arrival": "11:45 PM"
+        }
+      ],
+      "travel_history": [
+        {
+          "date": "2025-03-24",
+          "seats_booked": 12,
+          "passengers": ["userId5"],
+          "revenue": 4800
+        }
+      ],
+      "total_revenue": 4800
+    }
+  },
+  "routes": {
+    "routeId1": {
+      "origin": "Bhubaneswar",
+      "destination": "Puri",
+      "stops": [
+        {
+          "name": "Master Canteen",
+          "geolocation": {
+            "lat": 20.2724,
+            "lng": 85.8436
+          },
+          "arrival": "07:05 AM"
+        },
+        {
+          "name": "Pipili",
+          "geolocation": {
+            "lat": 20.1135,
+            "lng": 85.8315
+          },
+          "arrival": "07:45 AM"
+        },
+        {
+          "name": "Sakshigopal",
+          "geolocation": {
+            "lat": 19.9336,
+            "lng": 85.8223
+          },
+          "arrival": "08:15 AM"
+        }
+      ],
+      "distance_km": 60,
+      "ticket_price": 500,
+      "history": [
+        {
+          "date": "2025-03-20",
+          "busId": "busId1",
+          "passengers": 25
+        }
+      ]
+    },
+    "routeId2": {
+      "origin": "Cuttack",
+      "destination": "Konark",
+      "stops": [
+        {
+          "name": "Barabati Stadium",
+          "geolocation": {
+            "lat": 20.4818,
+            "lng": 85.8688
+          },
+          "arrival": "08:10 AM"
+        },
+        {
+          "name": "Chandikhol",
+          "geolocation": {
+            "lat": 20.6675,
+            "lng": 86.1668
+          },
+          "arrival": "09:00 AM"
+        },
+        {
+          "name": "Charbatia",
+          "geolocation": {
+            "lat": 20.5833,
+            "lng": 86.0833
+          },
+          "arrival": "09:30 AM"
+        }
+      ],
+      "distance_km": 80,
+      "ticket_price": 500,
+      "history": [
+        {
+          "date": "2025-03-21",
+          "busId": "busId2",
+          "passengers": 25
+        }
+      ]
+    },
+    "routeId3": {
+      "origin": "Bhubaneswar",
+      "destination": "Daringbadi",
+      "stops": [
+        {
+          "name": "Khandagiri",
+          "geolocation": {
+            "lat": 20.2631,
+            "lng": 85.7853
+          },
+          "arrival": "06:15 AM"
+        },
+        {
+          "name": "Phulbani",
+          "geolocation": {
+            "lat": 20.4765,
+            "lng": 84.2314
+          },
+          "arrival": "09:00 AM"
+        },
+        {
+          "name": "Balliguda",
+          "geolocation": {
+            "lat": 20.1833,
+            "lng": 83.9167
+          },
+          "arrival": "10:30 AM"
+        }
+      ],
+      "distance_km": 250,
+      "ticket_price": 1200,
+      "history": [
+        {
+          "date": "2025-03-22",
+          "busId": "busId3",
+          "passengers": 25
+        }
+      ]
+    },
+    "routeId4": {
+      "origin": "Puri",
+      "destination": "Berhampur",
+      "stops": [
+        {
+          "name": "Brahmagiri",
+          "geolocation": {
+            "lat": 19.6833,
+            "lng": 85.6167
+          },
+          "arrival": "08:00 AM"
+        },
+        {
+          "name": "Chatrapur",
+          "geolocation": {
+            "lat": 19.3500,
+            "lng": 84.9833
+          },
+          "arrival": "10:00 AM"
+        },
+        {
+          "name": "Ganjam",
+          "geolocation": {
+            "lat": 19.3833,
+            "lng": 85.0500
+          },
+          "arrival": "11:00 AM"
+        }
+      ],
+      "distance_km": 180,
+      "ticket_price": 600,
+      "history": [
+        {
+          "date": "2025-03-23",
+          "busId": "busId4",
+          "passengers": 38
+        }
+      ]
+    },
+    "routeId5": {
+      "origin": "Cuttack",
+      "destination": "Bhubaneswar",
+      "stops": [
+        {
+          "name": "Link Road",
+          "geolocation": {
+            "lat": 20.4667,
+            "lng": 85.9000
+          },
+          "arrival": "06:05 AM"
+        },
+        {
+          "name": "Badambadi",
+          "geolocation": {
+            "lat": 20.4500,
+            "lng": 85.8833
+          },
+          "arrival": "06:15 AM"
+        },
+        {
+          "name": "Patia",
+          "geolocation": {
+            "lat": 20.3667,
+            "lng": 85.8167
+          },
+          "arrival": "06:30 AM"
+        }
+      ],
+      "distance_km": 30,
+      "ticket_price": 400,
+      "history": [
+        {
+          "date": "2025-03-24",
+          "busId": "busId5",
+          "passengers": 12
+        }
+      ]
+    }
+  },
+  "bookings": {
+    "bookingId1": {
+      "userId": "userId1",
+      "busId": "busId1",
+      "seat_number": 12,
+      "payment_status": "Paid",
+      "booking_date": "2025-03-19",
+      "travel_date": "2025-03-20",
+      "amount": 500,
+      "tracking_id": "TRK123456"
+    },
+    "bookingId2": {
+      "userId": "userId2",
+      "busId": "busId2",
+      "seat_number": 5,
+      "payment_status": "Pending",
+      "booking_date": "2025-03-20",
+      "travel_date": "2025-03-21",
+      "amount": 700,
+      "tracking_id": "TRK123457"
+    },
+    "bookingId3": {
+      "userId": "userId3",
+      "busId": "busId3",
+      "seat_number": 8,
+      "payment_status": "Paid",
+      "booking_date": "2025-03-21",
+      "travel_date": "2025-03-22",
+      "amount": 1200,
+      "tracking_id": "TRK123458"
+    },
+    "bookingId4": {
+      "userId": "userId4",
+      "busId": "busId4",
+      "seat_number": 15,
+      "payment_status": "Paid",
+      "booking_date": "2025-03-22",
+      "travel_date": "2025-03-23",
+      "amount": 600,
+      "tracking_id": "TRK123459"
+    },
+    "bookingId5": {
+      "userId": "userId5",
+      "busId": "busId5",
+      "seat_number": 10,
+      "payment_status": "Paid",
+      "booking_date": "2025-03-23",
+      "travel_date": "2025-03-24",
+      "amount": 400,
+      "tracking_id": "TRK123460"
+    }
+  },
+  "tourism_sites": {
+    "siteId1": {
+      "name": "Konark Sun Temple",
+      "type": "Historical Temple",
+      "location": {
+        "lat": 19.8876,
+        "lng": 86.0945
+      },
+      "history": "13th-century UNESCO site built by King Narasimhadeva I.",
+      "images": ["konark1.jpg", "konark2.jpg"],
+      "3D_model": "konark.glb",
+      "schedule": {
+        "open": "06:00 AM",
+        "close": "08:00 PM",
+        "closed_days": "None"
+      },
+      "entry_fee": "INR 40",
+      "visitor_count": 1500
+    },
+    "siteId2": {
+      "name": "Chilika Lake",
+      "type": "Natural Site",
+      "location": {
+        "lat": 19.7144,
+        "lng": 85.4136
+      },
+      "history": "Asia’s largest brackish water lagoon, famous for dolphins.",
+      "images": ["chilika1.jpg", "chilika2.jpg"],
+      "3D_model": "chilika.glb",
+      "schedule": {
+        "open": "24/7",
+        "close": "None",
+        "closed_days": "None"
+      },
+      "entry_fee": "Free (Boat rides extra)",
+      "visitor_count": 2000
+    },
+    "siteId3": {
+      "name": "Dhauli Giri",
+      "type": "Historical Site",
+      "location": {
+        "lat": 20.1917,
+        "lng": 85.8395
+      },
+      "history": "Site of Kalinga War, Ashoka’s peace edicts.",
+      "images": ["dhauli1.jpg", "dhauli2.jpg"],
+      "3D_model": "dhauli.glb",
+      "schedule": {
+        "open": "06:00 AM",
+        "close": "06:00 PM",
+        "closed_days": "None"
+      },
+      "entry_fee": "Free",
+      "visitor_count": 1000
+    },
+    "siteId4": {
+      "name": "Udayagiri Caves",
+      "type": "Historical Caves",
+      "location": {
+        "lat": 20.2631,
+        "lng": 85.7853
+      },
+      "history": "Ancient Jain caves from 1st century BCE.",
+      "images": ["udayagiri1.jpg", "udayagiri2.jpg"],
+      "3D_model": "udayagiri.glb",
+      "schedule": {
+        "open": "08:00 AM",
+        "close": "05:00 PM",
+        "closed_days": "None"
+      },
+      "entry_fee": "INR 25",
+      "visitor_count": 800
+    },
+    "siteId5": {
+      "name": "Puri Beach",
+      "type": "Natural Site",
+      "location": {
+        "lat": 19.7983,
+        "lng": 85.8315
+      },
+      "history": "Famous beach near Jagannath Temple.",
+      "images": ["puri_beach1.jpg", "puri_beach2.jpg"],
+      "3D_model": "puri_beach.glb",
+      "schedule": {
+        "open": "24/7",
+        "close": "None",
+        "closed_days": "None"
+      },
+      "entry_fee": "Free",
+      "visitor_count": 2500
+    }
+  },
+  "trekking_routes": {
+    "trekId1": {
+      "name": "Daringbadi Hills",
+      "district": "Kandhamal",
+      "difficulty": "Moderate",
+      "distance_km": 12,
+      "nearby_areas": ["Balliguda", "Phulbani"],
+      "schedule_plan": [
+        {
+          "day": 1,
+          "activity": "Travel to Daringbadi",
+          "stay": "Daringbadi Resort"
+        },
+        {
+          "day": 2,
+          "activity": "Trek Hills, Visit Coffee Plantations",
+          "stay": "Daringbadi Resort"
+        },
+        {
+          "day": 3,
+          "activity": "Explore Balliguda Waterfalls",
+          "stay": "Return"
+        }
+      ],
+      "weather_advice": "Best in winter.",
+      "trek_history": [
+        {
+          "date": "2025-03-22",
+          "trekkers": ["userId3"]
+        }
+      ],
+      "elevation_m": 915
+    },
+    "trekId2": {
+      "name": "Deomali Peak",
+      "district": "Koraput",
+      "difficulty": "Hard",
+      "distance_km": 18,
+      "nearby_areas": ["Jeypore", "Koraput"],
+      "schedule_plan": [
+        {
+          "day": 1,
+          "activity": "Reach Jeypore",
+          "stay": "Jeypore Hotel"
+        },
+        {
+          "day": 2,
+          "activity": "Trek Deomali",
+          "stay": "Camping"
+        },
+        {
+          "day": 3,
+          "activity": "Visit Koraput",
+          "stay": "Return"
+        }
+      ],
+      "weather_advice": "Avoid monsoon.",
+      "trek_history": [
+        {
+          "date": "2025-03-23",
+          "trekkers": ["userId4"]
+        }
+      ],
+      "elevation_m": 1672
+    },
+    "trekId3": {
+      "name": "Khandadhar Falls",
+      "district": "Sundargarh",
+      "difficulty": "Easy",
+      "distance_km": 8,
+      "nearby_areas": ["Rourkela", "Bonaigarh"],
+      "schedule_plan": [
+        {
+          "day": 1,
+          "activity": "Travel to Rourkela",
+          "stay": "Rourkela Hotel"
+        },
+        {
+          "day": 2,
+          "activity": "Trek to Falls",
+          "stay": "Return"
+        }
+      ],
+      "weather_advice": "Post-monsoon best.",
+      "trek_history": [
+        {
+          "date": "2025-03-24",
+          "trekkers": ["userId5"]
+        }
+      ],
+      "elevation_m": 300
+    },
+    "trekId4": {
+      "name": "Gandhamardan Hills",
+      "district": "Bargarh",
+      "difficulty": "Moderate",
+      "distance_km": 15,
+      "nearby_areas": ["Nrusinghanath", "Harishankar"],
+      "schedule_plan": [
+        {
+          "day": 1,
+          "activity": "Reach Bargarh",
+          "stay": "Bargarh Guesthouse"
+        },
+        {
+          "day": 2,
+          "activity": "Trek Hills",
+          "stay": "Camping"
+        },
+        {
+          "day": 3,
+          "activity": "Visit Nrusinghanath Temple",
+          "stay": "Return"
+        }
+      ],
+      "weather_advice": "Cool weather ideal.",
+      "trek_history": [
+        {
+          "date": "2025-03-20",
+          "trekkers": ["userId1"]
+        }
+      ],
+      "elevation_m": 1000
+    },
+    "trekId5": {
+      "name": "Mahendragiri Peak",
+      "district": "Gajapati",
+      "difficulty": "Hard",
+      "distance_km": 20,
+      "nearby_areas": ["Paralakhemundi", "Berhampur"],
+      "schedule_plan": [
+        {
+          "day": 1,
+          "activity": "Travel to Berhampur",
+          "stay": "Berhampur Hotel"
+        },
+        {
+          "day": 2,
+          "activity": "Trek Mahendragiri",
+          "stay": "Camping"
+        },
+        {
+          "day": 3,
+          "activity": "Explore Paralakhemundi",
+          "stay": "Return"
+        }
+      ],
+      "weather_advice": "Winter recommended.",
+      "trek_history": [
+        {
+          "date": "2025-03-21",
+          "trekkers": ["userId2"]
+        }
+      ],
+      "elevation_m": 1501
+    }
+  },
+  "events": {
+    "eventId1": {
+      "name": "Puri Beach Festival",
+      "date": "2025-02-10",
+      "time": "10:00 AM - 08:00 PM",
+      "location": "Puri Beach",
+      "ticket_price": "Free",
+      "rules": ["No littering", "No alcohol on beach"],
+      "attendance_history": [
+        {
+          "date": "2024-02-10",
+          "attendees": 5000
+        }
+      ],
+      "organizer": "Odisha Tourism"
+    },
+    "eventId2": {
+      "name": "Konark Dance Festival",
+      "date": "2025-12-01",
+      "time": "06:00 PM - 10:00 PM",
+      "location": "Konark Sun Temple",
+      "ticket_price": "INR 500",
+      "rules": ["No photography during performances", "Entry by ticket only"],
+      "attendance_history": [
+        {
+          "date": "2024-12-01",
+          "attendees": 2000
+        }
+      ],
+      "organizer": "Odisha Dance Academy"
+    },
+    "eventId3": {
+      "name": "Rath Yatra",
+      "date": "2025-07-15",
+      "time": "05:00 AM - 11:00 PM",
+      "location": "Jagannath Temple, Puri",
+      "ticket_price": "Free",
+      "rules": ["No footwear", "Follow temple guidelines"],
+      "attendance_history": [
+        {
+          "date": "2024-07-06",
+          "attendees": 100000
+        }
+      ],
+      "organizer": "Puri Temple Trust"
+    },
+    "eventId4": {
+      "name": "Toshali Craft Mela",
+      "date": "2025-12-15",
+      "time": "11:00 AM - 09:00 PM",
+      "location": "Bhubaneswar",
+      "ticket_price": "INR 50",
+      "rules": ["No outside food", "Cash payments only"],
+      "attendance_history": [
+        {
+          "date": "2024-12-15",
+          "attendees": 3000
+        }
+      ],
+      "organizer": "Odisha Handicrafts Dept"
+    },
+    "eventId5": {
+      "name": "Chilika Bird Festival",
+      "date": "2025-01-10",
+      "time": "07:00 AM - 05:00 PM",
+      "location": "Chilika Lake",
+      "ticket_price": "INR 200",
+      "rules": ["No loud noises", "Binoculars recommended"],
+      "attendance_history": [
+        {
+          "date": "2024-01-10",
+          "attendees": 1500
+        }
+      ],
+      "organizer": "Odisha Wildlife Org"
+    }
+  },
+  "payments": {
+    "paymentId1": {
+      "userId": "userId1",
+      "amount": 500,
+      "status": "Completed",
+      "payment_date": "2025-03-19",
+      "method": "UPI",
+      "bookingId": "bookingId1",
+      "transaction_id": "TXN123456"
+    },
+    "paymentId2": {
+      "userId": "userId2",
+      "amount": 700,
+      "status": "Pending",
+      "payment_date": "2025-03-20",
+      "method": "Card",
+      "bookingId": "bookingId2",
+      "transaction_id": "TXN123457"
+    },
+    "paymentId3": {
+      "userId": "userId3",
+      "amount": 1200,
+      "status": "Completed",
+      "payment_date": "2025-03-21",
+      "method": "Wallet",
+      "bookingId": "bookingId3",
+      "transaction_id": "TXN123458"
+    },
+    "paymentId4": {
+      "userId": "userId4",
+      "amount": 600,
+      "status": "Completed",
+      "payment_date": "2025-03-22",
+      "method": "Cash on Boarding",
+      "bookingId": "bookingId4",
+      "transaction_id": "TXN123459"
+    },
+    "paymentId5": {
+      "userId": "userId5",
+      "amount": 400,
+      "status": "Completed",
+      "payment_date": "2025-03-23",
+      "method": "UPI",
+      "bookingId": "bookingId5",
+      "transaction_id": "TXN123460"
+    }
+  }
+};
+
+async function authenticate() {
+  try {
+    const userCredential = await signInAnonymously(auth);
+    console.log('Authenticated anonymously:', userCredential.user.uid);
+    return userCredential.user;
+  } catch (error) {
+    console.error('Authentication failed:', error);
+    throw error;
+  }
+}
+
+async function uploadData() {
+  try {
+    // Authenticate first
+    const user = await authenticate();
+
+    // Upload users
+    for (const [id, userData] of Object.entries(data.users)) {
+      await setDoc(doc(db, 'users', id), userData);
+      console.log(`Uploaded user: ${id}`);
+    }
+    // Upload buses
+    for (const [id, bus] of Object.entries(data.buses)) {
+      await setDoc(doc(db, 'buses', id), bus);
+      console.log(`Uploaded bus: ${id}`);
+    }
+    // Upload routes
+    for (const [id, route] of Object.entries(data.routes)) {
+      await setDoc(doc(db, 'routes', id), route);
+      console.log(`Uploaded route: ${id}`);
+    }
+    // Upload bookings
+    for (const [id, booking] of Object.entries(data.bookings)) {
+      await setDoc(doc(db, 'bookings', id), booking);
+      console.log(`Uploaded booking: ${id}`);
+    }
+    // Upload tourism_sites
+    for (const [id, site] of Object.entries(data.tourism_sites)) {
+      await setDoc(doc(db, 'tourism_sites', id), site);
+      console.log(`Uploaded tourism site: ${id}`);
+    }
+    // Upload trekking_routes
+    for (const [id, trek] of Object.entries(data.trekking_routes)) {
+      await setDoc(doc(db, 'trekking_routes', id), trek);
+      console.log(`Uploaded trekking route: ${id}`);
+    }
+    // Upload events
+    for (const [id, event] of Object.entries(data.events)) {
+      await setDoc(doc(db, 'events', id), event);
+      console.log(`Uploaded event: ${id}`);
+    }
+    // Upload payments
+    for (const [id, payment] of Object.entries(data.payments)) {
+      await setDoc(doc(db, 'payments', id), payment);
+      console.log(`Uploaded payment: ${id}`);
+    }
+    console.log('All data uploaded successfully');
+  } catch (error) {
+    console.error('Error uploading data:', error);
+  }
+}
+
+uploadData();

@@ -1,5 +1,5 @@
 import { realtimeDb } from './firebase-config.js';
-import { ref, onValue, set, update } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
+import { ref, onValue, set, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
 // Subscribe to live bus location
 export function subscribeToBusLocation(busId, callback) {

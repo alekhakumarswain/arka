@@ -4,11 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arka - Profile</title>
-  <!-- Bootstrap CSS (CDN) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Animate.css (CDN) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-  <!-- Custom CSS -->
   <style>
     body, html {
       margin: 0;
@@ -78,6 +75,12 @@
       color: white;
       transform: scale(1.05);
     }
+    .btn-danger {
+      transition: transform 0.3s ease;
+    }
+    .btn-danger:hover {
+      transform: scale(1.05);
+    }
     h1 {
       font-size: 2.5rem;
       color: #f59e0b;
@@ -116,6 +119,18 @@
       box-shadow: none;
       border-color: #f59e0b;
     }
+    .qr-code {
+      max-width: 200px;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    }
+    .booking-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
     @media (max-width: 768px) {
       .navbar-brand { font-size: 1.5rem; }
       .nav-link { font-size: 0.9rem; padding: 0.5rem; }
@@ -133,7 +148,6 @@
   </style>
 </head>
 <body>
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="/index.html">Arka</a>
@@ -154,7 +168,6 @@
     </div>
   </nav>
 
-  <!-- Profile Section -->
   <div class="container">
     <h1>Your Profile</h1>
     <div class="row">
@@ -163,12 +176,26 @@
           <h5>User Info</h5>
           <p id="userInfo">Loading...</p>
           <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
-          <button class="btn btn-outline-light mt-2" onclick="logout()">Logout</button>
+          <button class="btn btn-outline-light mt-2" id="logoutButton">Logout</button>
         </div>
       </div>
       <div class="col-md-6">
         <div class="card text-white">
+          <h5>Booking Statistics</h5>
+          <p id="bookingStats">Loading...</p>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="card text-white">
           <h5>Booking History</h5>
+          <div class="mb-3">
+            <label for="sortBookings" class="form-label">Sort By</label>
+            <select class="form-control" id="sortBookings">
+              <option value="date-desc">Date (Newest First)</option>
+              <option value="date-asc">Date (Oldest First)</option>
+              <option value="status">Status (Upcoming First)</option>
+            </select>
+          </div>
           <div id="bookingHistory">Loading...</div>
           <button class="btn btn-outline-light mt-2" onclick="viewAllTrips()">View All Trips</button>
         </div>
@@ -176,21 +203,21 @@
       <div class="col-md-6">
         <div class="card text-white">
           <h5>Saved Places</h5>
-          <div id="savedPlaces">No saved places yet.</div>
+          <div id="savedPlaces">Loading...</div>
           <button class="btn btn-outline-light mt-2" onclick="viewSavedPlaces()">View All Places</button>
         </div>
       </div>
       <div class="col-md-6">
         <div class="card text-white">
-          <h5>Trekking History</h5>
-          <div id="trekkingHistory">No treks recorded.</div>
-          <button class="btn btn-outline-light mt-2" onclick="viewTrekkingHistory()">View All Treks</button>
+          <h5>Saved Treks</h5>
+          <div id="savedTreks">Loading...</div>
+          <button class="btn btn-outline-light mt-2" onclick="viewSavedTreks()">View All Treks</button>
         </div>
       </div>
       <div class="col-md-6">
         <div class="card text-white">
           <h5>Event Bookings</h5>
-          <div id="eventBookings">No event bookings found.</div>
+          <div id="eventBookings">Loading...</div>
           <button class="btn btn-outline-light mt-2" onclick="viewEventBookings()">View All Events</button>
         </div>
       </div>
@@ -219,61 +246,384 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+          <button type="button" class="btn btn-primary" id="saveProfileButton">Save Changes</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script type="module" src="/assets/js/services/auth.js"></script>
-  <script type="module" src="/assets/js/services/firestore.js"></script>
+  <!-- Ticket Modal -->
+  <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ticketModalLabel">Your Ticket</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p><strong>Route:</strong> <span id="ticketRoute"></span></p>
+          <p><strong>Date:</strong> <span id="ticketDate"></span></p>
+          <p><strong>Seats:</strong> <span id="ticketSeats"></span></p>
+          <p><strong>Total Paid:</strong> ₹<span id="ticketAmount"></span></p>
+          <img id="qrCode" class="qr-code" alt="QR Code">
+          <p class="mt-3">Scan this QR code at the bus for boarding.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getDatabase, ref, onValue, remove, set, query, orderByChild, equalTo } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
     import { onAuthStateChange, signOutUser } from '/assets/js/services/auth.js';
-    import { getUserProfile, getUserBookings, updateUserProfile } from '/assets/js/services/firestore.js';
 
-    // Check auth state and redirect if not logged in
+    const firebaseConfig = {
+      apiKey: "AIzaSyDkYJtwm9mqrq2zFIIr0DXElYG44WIpswI",
+      authDomain: "arka-5258.firebaseapp.com",
+      databaseURL: "https://arka-5258-default-rtdb.firebaseio.com",
+      projectId: "arka-5258",
+      storageBucket: "arka-5258.firebasestorage.app",
+      messagingSenderId: "378365125891",
+      appId: "1:378365125891:web:43e9ca1df58152d9f8b536",
+      measurementId: "G-2V7TSEBWQ8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const firestore = getFirestore(app);
+
+    // Show loading state
+    function showLoading(button) {
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+    }
+
+    // Hide loading state
+    function hideLoading(button, originalText) {
+      button.disabled = false;
+      button.innerHTML = originalText;
+    }
+
+    // Logout function
+    async function logout() {
+      const logoutButton = document.getElementById('logoutButton');
+      const originalText = logoutButton.innerHTML;
+      showLoading(logoutButton);
+      try {
+        await signOutUser();
+        window.location.href = '/index.html';
+      } catch (error) {
+        document.getElementById('errorMessage').textContent = error.message;
+      } finally {
+        hideLoading(logoutButton, originalText);
+      }
+    }
+
+    // Fetch user profile directly
+    async function fetchUserProfile(userId) {
+      try {
+        const userDocRef = doc(firestore, 'users', userId);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          console.log('User profile fetched:', userDoc.data());
+          return userDoc.data();
+        } else {
+          console.log('No user profile found in Firestore for UID:', userId);
+          return null;
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        throw error;
+      }
+    }
+
+    // Update user profile
+    async function updateUserProfile(userId, profileData) {
+      try {
+        const userDocRef = doc(firestore, 'users', userId);
+        await setDoc(userDocRef, profileData, { merge: true });
+        console.log('User profile updated:', profileData);
+      } catch (error) {
+        console.error('Error updating user profile:', error);
+        throw error;
+      }
+    }
+
+    // Save profile function
+    async function saveProfile() {
+      const name = document.getElementById('editName').value;
+      const phone = document.getElementById('editPhone').value;
+      const errorElement = document.getElementById('editError');
+      const saveButton = document.getElementById('saveProfileButton');
+      const originalText = saveButton.innerHTML;
+
+      if (!name) {
+        errorElement.textContent = 'Please enter your full name.';
+        return;
+      }
+
+      showLoading(saveButton);
+      try {
+        const user = await new Promise((resolve) => onAuthStateChange(resolve));
+        if (!user) throw new Error('User not logged in.');
+        const profileData = {
+          name,
+          email: user.email,
+          phone: phone || ''
+        };
+        await updateUserProfile(user.uid, profileData);
+        document.getElementById('userInfo').innerHTML = `
+          Name: ${name}<br>
+          Email: ${user.email}<br>
+          Phone: ${phone || 'Not provided'}
+        `;
+        bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+      } catch (error) {
+        errorElement.textContent = error.message;
+      } finally {
+        hideLoading(saveButton, originalText);
+      }
+    }
+
+    // Fetch bookings from Realtime Database using a query
+    async function fetchUserBookings(userId) {
+      return new Promise((resolve, reject) => {
+        const ticketsRef = ref(database, 'tickets');
+        const userTicketsQuery = query(ticketsRef, orderByChild('userId'), equalTo(userId));
+        onValue(userTicketsQuery, (snapshot) => {
+          const tickets = snapshot.val() || {};
+          const userTickets = Object.entries(tickets)
+            .map(([ticketId, ticket]) => ({ ticketId, ...ticket }));
+          resolve(userTickets);
+        }, (error) => {
+          reject(error);
+        });
+      });
+    }
+
+    // Cancel booking
+    async function cancelBooking(ticketId, busId, seats) {
+      try {
+        await remove(ref(database, `tickets/${ticketId}`));
+        const busRef = ref(database, `buses/${busId}`);
+        onValue(busRef, async (snapshot) => {
+          const bus = snapshot.val();
+          if (bus) {
+            const newSeatsAvailable = bus.seats_available + seats.length;
+            await set(ref(database, `buses/${busId}/seats_available`), newSeatsAvailable);
+          }
+        }, { onlyOnce: true });
+
+        const user = await new Promise((resolve) => onAuthStateChange(resolve));
+        if (user) {
+          await loadBookings(user.uid);
+        }
+      } catch (error) {
+        document.getElementById('errorMessage').textContent = 'Error cancelling booking: ' + error.message;
+      }
+    }
+
+    // Show ticket details
+    function showTicketDetails(booking) {
+      document.getElementById('ticketRoute').textContent = booking.route;
+      document.getElementById('ticketDate').textContent = booking.date;
+      document.getElementById('ticketSeats').textContent = booking.seats.join(', ');
+      document.getElementById('ticketAmount').textContent = booking.amount;
+      
+      const qrData = JSON.stringify({
+        ticketId: booking.ticketId,
+        route: booking.route,
+        date: booking.date,
+        seats: booking.seats,
+        amount: booking.amount
+      });
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+      document.getElementById('qrCode').src = qrCodeUrl;
+
+      const ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+      ticketModal.show();
+    }
+
+    // Load and display bookings
+    async function loadBookings(userId) {
+      try {
+        const bookings = await fetchUserBookings(userId);
+        const bookingHistory = document.getElementById('bookingHistory');
+        const bookingStats = document.getElementById('bookingStats');
+
+        const today = new Date('2025-05-12');
+        const totalTrips = bookings.length;
+        const upcomingTrips = bookings.filter(booking => new Date(booking.date) > today).length;
+        const totalSpent = bookings.reduce((sum, booking) => sum + (booking.amount || 0), 0);
+
+        bookingStats.innerHTML = `
+          Total Trips: ${totalTrips}<br>
+          Upcoming Trips: ${upcomingTrips}<br>
+          Total Spent: ₹${totalSpent}
+        `;
+
+        const sortBy = document.getElementById('sortBookings').value;
+        bookings.sort((a, b) => {
+          if (sortBy === 'date-desc') {
+            return new Date(b.timestamp) - new Date(a.timestamp);
+          } else if (sortBy === 'date-asc') {
+            return new Date(a.timestamp) - new Date(b.timestamp);
+          } else if (sortBy === 'status') {
+            const aIsUpcoming = new Date(a.date) > today ? 1 : 0;
+            const bIsUpcoming = new Date(b.date) > today ? 1 : 0;
+            return bIsUpcoming - aIsUpcoming;
+          }
+          return 0;
+        });
+
+        if (bookings.length > 0) {
+          bookingHistory.innerHTML = bookings.map(booking => {
+            const bookingDate = new Date(booking.date);
+            const isFuture = bookingDate > today;
+            return `
+              <div class="booking-card">
+                <p><strong>Trip:</strong> ${booking.route || 'Unknown'}</p>
+                <p><strong>Date:</strong> ${booking.date}</p>
+                <p><strong>Seats:</strong> ${booking.seats.join(', ')}</p>
+                <p><strong>Total Paid:</strong> ₹${booking.amount}</p>
+                <p><strong>Status:</strong> ${isFuture ? 'Upcoming' : 'Past'}</p>
+                <button class="btn btn-primary btn-sm me-2" onclick='showTicketDetails(${JSON.stringify(booking)})'>View Ticket</button>
+                ${isFuture ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking('${booking.ticketId}', '${booking.busId}', ${JSON.stringify(booking.seats)})">Cancel Booking</button>` : ''}
+              </div>
+            `;
+          }).join('');
+        } else {
+          bookingHistory.textContent = 'No bookings found.';
+        }
+      } catch (error) {
+        document.getElementById('errorMessage').textContent = 'Error loading bookings: ' + error.message;
+      }
+    }
+
+    // Fetch and display saved places
+    async function loadSavedPlaces(userId) {
+      const savedPlacesDiv = document.getElementById('savedPlaces');
+      try {
+        const userDocRef = doc(firestore, 'users', userId);
+        onSnapshot(userDocRef, (doc) => {
+          if (doc.exists() && doc.data().saved_places) {
+            const savedPlaces = doc.data().saved_places;
+            const placesList = Object.entries(savedPlaces).map(([siteId, site]) => `
+              <div class="booking-card">
+                <p><strong>Name:</strong> ${site.name}</p>
+                <p><strong>Type:</strong> ${site.type}</p>
+                <p><strong>Entry Fee:</strong> ${site.entry_fee}</p>
+              </div>
+            `).join('');
+            savedPlacesDiv.innerHTML = placesList || 'No saved places yet.';
+          } else {
+            savedPlacesDiv.textContent = 'No saved places yet.';
+          }
+        });
+      } catch (error) {
+        console.error('Error loading saved places:', error);
+        savedPlacesDiv.textContent = 'Error loading saved places.';
+      }
+    }
+
+    // Fetch and display saved treks
+    async function loadSavedTreks(userId) {
+      const savedTreksDiv = document.getElementById('savedTreks');
+      try {
+        const userDocRef = doc(firestore, 'users', userId);
+        onSnapshot(userDocRef, (doc) => {
+          if (doc.exists() && doc.data().saved_treks) {
+            const savedTreks = doc.data().saved_treks;
+            const treksList = Object.entries(savedTreks).map(([trekId, trek]) => `
+              <div class="booking-card">
+                <p><strong>Name:</strong> ${trek.name}</p>
+                <p><strong>District:</strong> ${trek.district}</p>
+                <p><strong>Difficulty:</strong> ${trek.difficulty}</p>
+                <p><strong>Distance:</strong> ${trek.distance_km} km</p>
+                <p><strong>Weather Advice:</strong> ${trek.weather_advice}</p>
+              </div>
+            `).join('');
+            savedTreksDiv.innerHTML = treksList || 'No saved treks yet.';
+          } else {
+            savedTreksDiv.textContent = 'No saved treks yet.';
+          }
+        });
+      } catch (error) {
+        console.error('Error loading saved treks:', error);
+        savedTreksDiv.textContent = 'Error loading saved treks.';
+      }
+    }
+
+    // Fetch and display event bookings
+    async function loadEventBookings(userId) {
+      const eventBookingsDiv = document.getElementById('eventBookings');
+      try {
+        const userDocRef = doc(firestore, 'users', userId);
+        onSnapshot(userDocRef, (doc) => {
+          if (doc.exists() && doc.data().event_bookings) {
+            const eventBookings = doc.data().event_bookings;
+            const eventsList = Object.entries(eventBookings).map(([eventId, event]) => `
+              <div class="booking-card">
+                <p><strong>Name:</strong> ${event.name}</p>
+                <p><strong>Type:</strong> ${event.type.charAt(0).toUpperCase() + event.type.slice(1)}</p>
+                <p><strong>Date:</strong> ${event.date}</p>
+                <p><strong>Time:</strong> ${event.time}</p>
+                <p><strong>Location:</strong> ${event.location}</p>
+                <p><strong>Ticket Price:</strong> ${event.ticket_price}</p>
+              </div>
+            `).join('');
+            eventBookingsDiv.innerHTML = eventsList || 'No event bookings yet.';
+          } else {
+            eventBookingsDiv.textContent = 'No event bookings yet.';
+          }
+        });
+      } catch (error) {
+        console.error('Error loading event bookings:', error);
+        eventBookingsDiv.textContent = 'Error loading event bookings.';
+      }
+    }
+
+    // Check auth state and load profile
     onAuthStateChange(async (user) => {
       const authLink = document.getElementById('authLink');
       const errorElement = document.getElementById('errorMessage');
       if (user) {
-        console.log('User logged in:', user);
         authLink.textContent = 'Logout';
         authLink.href = '#';
         authLink.onclick = logout;
         try {
-          // Fetch and display user profile
-          console.log('Fetching profile for user ID:', user.uid);
-          const profile = await getUserProfile(user.uid);
-          console.log('Profile data fetched:', profile);
+          console.log('Authenticated user:', user.uid, user.email);
+          const profile = await fetchUserProfile(user.uid);
           if (profile) {
             document.getElementById('userInfo').innerHTML = `
               Name: ${profile.name}<br>
               Email: ${profile.email}<br>
               Phone: ${profile.phone || 'Not provided'}
             `;
-            // Pre-fill modal fields
-            document.getElementById('editName').value = profile.name;
+            document.getElementById('editName').value = profile.name || '';
             document.getElementById('editPhone').value = profile.phone || '';
           } else {
-            document.getElementById('userInfo').textContent = 'Profile not found.';
+            document.getElementById('userInfo').innerHTML = `
+              Name: Not set<br>
+              Email: ${user.email}<br>
+              Phone: Not set<br>
+              <small>Please use "Edit Profile" to set up your profile.</small>
+            `;
+            document.getElementById('editName').value = '';
+            document.getElementById('editPhone').value = '';
           }
-          // Fetch and display booking history
-          const bookings = await getUserBookings(user.uid);
-          const bookingHistory = document.getElementById('bookingHistory');
-          if (bookings.length > 0) {
-            bookingHistory.innerHTML = bookings.map(booking => `
-              <p>Trip: ${booking.route || 'Unknown'}<br>Date: ${new Date(booking.created_at).toLocaleDateString()}</p>
-            `).join('');
-          } else {
-            bookingHistory.textContent = 'No bookings found.';
-          }
-          // Placeholder for future data (Saved Places, Trekking History, Event Bookings)
-          // These can be implemented with Firestore collections like arka/users/{uid}/saved_places
+
+          await loadBookings(user.uid);
+          await loadSavedPlaces(user.uid);
+          await loadSavedTreks(user.uid);
+          await loadEventBookings(user.uid);
         } catch (error) {
-          console.error('Error fetching profile or bookings:', error);
-          errorElement.textContent = error.message;
+          errorElement.textContent = 'Error loading profile: ' + error.message;
         }
       } else {
         authLink.textContent = 'Login';
@@ -283,48 +633,25 @@
       }
     });
 
-    async function logout() {
-      try {
-        await signOutUser();
-        window.location.href = '/index.html';
-      } catch (error) {
-        document.getElementById('errorMessage').textContent = error.message;
+    // Event listeners
+    document.getElementById('logoutButton').addEventListener('click', logout);
+    document.getElementById('saveProfileButton').addEventListener('click', saveProfile);
+    document.getElementById('sortBookings').addEventListener('change', async () => {
+      const user = await new Promise((resolve) => onAuthStateChange(resolve));
+      if (user) {
+        await loadBookings(user.uid);
       }
-    }
+    });
 
-    async function saveProfile() {
-      const name = document.getElementById('editName').value;
-      const phone = document.getElementById('editPhone').value;
-      const errorElement = document.getElementById('editError');
-      try {
-        const user = await new Promise((resolve) => onAuthStateChange(resolve));
-        await updateUserProfile(user.uid, { name, phone });
-        document.getElementById('userInfo').innerHTML = `
-          Name: ${name}<br>
-          Email: ${user.email}<br>
-          Phone: ${phone || 'Not provided'}
-        `;
-        bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
-      } catch (error) {
-        errorElement.textContent = error.message;
-      }
-    }
+    // Placeholder functions
+    function viewAllTrips() { alert('View All Trips functionality coming soon!'); }
+    function viewSavedPlaces() { alert('View Saved Places functionality coming soon!'); }
+    function viewSavedTreks() { alert('View All Treks functionality coming soon!'); }
+    function viewEventBookings() { alert('View Event Bookings functionality coming soon!'); }
 
-    function viewAllTrips() {
-      alert('View All Trips functionality coming soon!');
-    }
-
-    function viewSavedPlaces() {
-      alert('View Saved Places functionality coming soon!');
-    }
-
-    function viewTrekkingHistory() {
-      alert('View Trekking History functionality coming soon!');
-    }
-
-    function viewEventBookings() {
-      alert('View Event Bookings functionality coming soon!');
-    }
+    // Expose functions to global scope
+    window.showTicketDetails = showTicketDetails;
+    window.cancelBooking = cancelBooking;
   </script>
 </body>
 </html>

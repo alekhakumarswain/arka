@@ -8,239 +8,40 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #1a1a3d;
-      color: white;
-      font-family: 'Arial', sans-serif;
-      scroll-behavior: smooth;
-      position: relative;
-      transition: background 0.5s ease, color 0.5s ease;
-    }
-
-    body.light-theme {
-      background: #f0f0f0;
-      color: #333;
-    }
-
-    body.light-theme .navbar { background: rgba(255, 255, 255, 0.9); }
-    body.light-theme .nav-link { color: #333 !important; }
-    body.light-theme .nav-link:hover { color: #00aaff !important; }
-    body.light-theme .card { background: rgba(0, 0, 0, 0.1); }
-    body.light-theme .leaflet-control-attribution { background: rgba(255, 255, 255, 0.9) !important; color: #333; }
-    body.light-theme .legend { background: rgba(255, 255, 255, 0.9); color: #333; }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('https://www.transparenttextures.com/patterns/stardust.png');
-      opacity: 0.3;
-      z-index: 1;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-    }
-
-    body.light-theme::before { opacity: 0; }
-
-    @keyframes shimmer {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    body:not(.light-theme) {
-      background: linear-gradient(135deg, #1a1a3d 0%, #2a4066 100%);
-      background-size: 200% 200%;
-      animation: shimmer 15s ease infinite;
-    }
-
-    .navbar {
-      background: rgba(0, 0, 0, 0.6);
-      position: relative;
-      z-index: 1000;
-      animation: fadeInDown 1s ease;
-    }
-
-    @keyframes fadeInDown {
-      from { transform: translateY(-100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .navbar-brand {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #00aaff !important;
-      text-transform: uppercase;
-    }
-
-    .nav-link {
-      color: white !important;
-      font-size: 1.1rem;
-      transition: color 0.3s ease;
-    }
-
-    .nav-link:hover { color: #00aaff !important; }
-
-    .container {
-      position: relative;
-      z-index: 2;
-      padding: 2rem;
-    }
-
-    h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 2rem;
-      color: #00aaff;
-      animation: fadeIn 1.5s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .map-container {
-      height: 500px;
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-      background: rgba(255, 255, 255, 0.1);
-      animation: fadeIn 2s ease;
-    }
-
+    body { background: #1a1a3d; color: white; font-family: 'Arial', sans-serif; }
+    .map-container { height: 500px; border-radius: 10px; overflow: hidden; position: relative; }
     #map { height: 100%; }
-
-    .card {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      border-radius: 15px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      transition: transform 0.3s ease;
-      animation: fadeIn 2s ease;
-    }
-
-    .card:hover { transform: translateY(-5px); }
-
-    .btn-primary, .btn-secondary {
-      border: none;
-      padding: 0.5rem 1.5rem;
-      border-radius: 10px;
-      font-weight: bold;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .btn-primary {
-      background: #00aaff;
-    }
-
-    .btn-primary:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
-    }
-
-    .btn-secondary {
-      background: #6c757d;
-    }
-
-    .btn-secondary:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 10px rgba(108, 117, 125, 0.5);
-    }
-
-    .leaflet-control-attribution { background: rgba(0, 0, 0, 0.7) !important; color: white; }
-    .bus-info-window { color: black; min-width: 250px; background: rgba(255, 255, 255, 0.9); padding: 10px; border-radius: 10px; }
+    .navbar { background: rgba(0, 0, 0, 0.6); }
+    .navbar-brand { font-size: 1.8rem; font-weight: bold; color: #00aaff !important; }
+    .nav-link { color: white !important; }
+    .nav-link:hover { color: #00aaff !important; }
+    .card { background: rgba(255, 255, 255, 0.1); border: none; }
+    .btn { transition: transform 0.3s ease; }
+    .btn:hover { transform: scale(1.05); }
+    .leaflet-control-attribution { background: rgba(0,0,0,0.7) !important; color: white; }
+    .bus-info-window { color: black; min-width: 250px; }
     .status-on-route { color: #28a745; }
     .status-departing-soon { color: #ffc107; }
     .status-arrived { color: #17a2b8; }
     .status-at-depot { color: #6c757d; }
-
-    .legend {
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px;
-      border-radius: 5px;
-      color: white;
-    }
-
-    .legend i {
-      width: 18px;
-      height: 18px;
-      display: inline-block;
-      margin-right: 5px;
-    }
-
-    .route-controls {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-    }
-
-    .loading-spinner {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1001;
-      box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
-    }
-
-    .theme-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1000;
-      background: #00aaff;
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.3s ease;
-    }
-
-    .theme-toggle:hover {
-      background: #0088cc;
-      transform: scale(1.1);
-    }
-
-    .theme-toggle i {
-      color: white;
-      font-size: 1.5rem;
-    }
-
+    .legend { background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; }
+    .legend i { width: 18px; height: 18px; display: inline-block; margin-right: 5px; }
+    .route-controls { position: absolute; top: 10px; right: 10px; z-index: 1000; }
+    .loading-spinner { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; }
     @media (max-width: 768px) {
-      h1 { font-size: 2rem; }
       .navbar-brand { font-size: 1.5rem; }
       .nav-link { font-size: 0.9rem; }
       .map-container { height: 400px; }
-      .theme-toggle { width: 40px; height: 40px; }
-      .theme-toggle i { font-size: 1.2rem; }
     }
-
     @media (max-width: 576px) {
-      h1 { font-size: 1.8rem; }
       .navbar-brand { font-size: 1.3rem; }
       .nav-link { font-size: 0.8rem; }
       .map-container { height: 300px; }
-      .theme-toggle { width: 35px; height: 35px; }
-      .theme-toggle i { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
+  <!-- Loading Spinner -->
   <div id="loading-spinner" class="loading-spinner text-white">
     <div class="spinner-border" role="status">
       <span class="visually-hidden">Loading...</span>
@@ -267,19 +68,19 @@
     </div>
   </nav>
 
-  <div class="container">
+  <div class="container mt-5">
     <h1 class="text-center mb-4">Real-Time Bus Tracking</h1>
     <div class="map-container mb-4 position-relative">
       <div id="map"></div>
       <div class="route-controls">
-        <button id="show-routes" class="btn btn-primary btn-sm mb-2">Show All Routes</button>
-        <button id="hide-routes" class="btn btn-secondary btn-sm">Hide Routes</button>
+        <button id="show-routes" class="btn btn-sm btn-primary mb-2">Show All Routes</button>
+        <button id="hide-routes" class="btn btn-sm btn-secondary">Hide Routes</button>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
         <div class="card text-white p-3">
-          <h4 class="mb-3" style="color: #00aaff;">Active Buses</h4>
+          <h4 class="mb-3">Active Buses</h4>
           <div id="bus-list" class="row">
             <p id="no-buses-message" style="display: none;">No active buses available at the moment.</p>
           </div>
@@ -288,20 +89,16 @@
     </div>
   </div>
 
-  <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
-    <i class="fas fa-moon"></i>
-  </button>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
     import { onAuthStateChange, signOutUser } from '/assets/js/services/auth.js';
     import { subscribeToBusLocation } from '/assets/js/services/realtime.js';
 
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDkYJtwm9mqrq2zFIIr0DXElYG44WIpswI",
       authDomain: "arka-5258.firebaseapp.com",
@@ -313,16 +110,19 @@
       measurementId: "G-2V7TSEBWQ8"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
     console.log('Firebase and Realtime Database initialized:', app, database);
 
+    // Initialize the map centered on Odisha, India
     const map = L.map('map').setView([20.9517, 85.0985], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
+    // Status color mapping
     const statusColors = {
       "On Route": "#28a745",
       "Departing Soon": "#ffc107",
@@ -330,18 +130,22 @@
       "At Depot": "#6c757d"
     };
 
+    // Arrays to store markers and routes
     const busMarkers = [];
     const routeControls = [];
     const busStopsMarkers = [];
 
+    // Function to show loading spinner
     function showLoading() {
       document.getElementById('loading-spinner').style.display = 'block';
     }
 
+    // Function to hide loading spinner
     function hideLoading() {
       document.getElementById('loading-spinner').style.display = 'none';
     }
 
+    // Function to fetch bus and route data from Realtime Database
     function fetchDataFromRealtimeDatabase() {
       showLoading();
       return new Promise((resolve, reject) => {
@@ -371,6 +175,7 @@
       });
     }
 
+    // Function to calculate road-based route
     async function calculateRoute(waypoints, bus) {
       showLoading();
       try {
@@ -397,6 +202,7 @@
       }
     }
 
+    // Function to process buses and add to map
     async function processBuses(data) {
       const busesArray = Object.values(data.buses);
       for (const bus of busesArray) {
@@ -406,6 +212,7 @@
         );
         const routeDetails = routeId ? data.routes[routeId] : null;
 
+        // Create bus marker
         const busMarker = L.marker([bus.current_location.lat, bus.current_location.lng], {
           icon: L.divIcon({
             className: 'bus-icon',
@@ -418,7 +225,7 @@
           <div class="bus-info-window">
             <h5>${bus.route}</h5>
             <p><strong>Status:</strong> <span class="status-${bus.live_status.toLowerCase().replace(' ', '-') || 'unknown'}">${bus.live_status}</span></p>
-            <p><strong>Seats Available:</strong> ${bus.seats_available}/${bus.total_seats}</p>
+            <p><strong>Seats:</strong> ${bus.seats_available}/${bus.total_seats} available</p>
             <p><strong>Driver:</strong> ${bus.driver_id}</p>
             <p><strong>Next Trip:</strong> ${bus.schedule[0].direction === 'A_to_B' ? (routeDetails ? routeDetails.destination : 'Unknown') : (routeDetails ? routeDetails.origin : 'Unknown')} at ${bus.schedule[0].departure}</p>
           </div>
@@ -426,6 +233,7 @@
         busMarker.bindPopup(infoContent);
         busMarkers.push(busMarker);
 
+        // Create route waypoints
         if (routeDetails && routeDetails.stops && routeDetails.stops.length > 0) {
           const waypoints = [
             L.latLng(bus.current_location.lat, bus.current_location.lng),
@@ -434,6 +242,7 @@
           await calculateRoute(waypoints, bus);
         }
 
+        // Create bus stop markers
         if (routeDetails && routeDetails.stops) {
           routeDetails.stops.forEach(stop => {
             const stopMarker = L.marker([stop.geolocation.lat, stop.geolocation.lng], {
@@ -447,6 +256,7 @@
           });
         }
 
+        // Subscribe to real-time location updates
         subscribeToBusLocation(busId, (location) => {
           if (location) {
             console.log(`Updating location for bus ${busId}:`, location);
@@ -456,12 +266,9 @@
                 L.latLng(location.latitude, location.longitude),
                 ...routeDetails.stops.map(stop => L.latLng(stop.geolocation.lat, stop.geolocation.lng))
               ];
-              const controlIndex = routeControls.findIndex(c => {
-                const firstWaypoint = c.getPlan().getWaypoints()[0];
-                return firstWaypoint.latLng.lat === bus.current_location.lat && firstWaypoint.latLng.lng === bus.current_location.lng;
-              });
-              if (controlIndex !== -1) {
-                routeControls[controlIndex].setWaypoints(waypoints);
+              const control = routeControls.find(c => c.getPlan().getWaypoints()[0].latLng.equals(busMarker.getLatLng()));
+              if (control) {
+                control.setWaypoints(waypoints);
               }
             }
           }
@@ -469,6 +276,7 @@
       }
     }
 
+    // Function to update bus list
     function updateBusList(data) {
       const busListElement = document.getElementById('bus-list');
       const noBusesMessage = document.getElementById('no-buses-message');
@@ -487,23 +295,21 @@
         );
         const routeDetails = routeId ? data.routes[routeId] : null;
 
-        const [from, to] = bus.route.split(' - ');
-
         const busElement = document.createElement('div');
         busElement.className = 'col-md-6 mb-3';
         busElement.innerHTML = `
           <div class="card text-white p-3 h-100" style="border-left: 4px solid ${statusColors[bus.live_status] || '#6c757d'}">
             <h5>${bus.route}</h5>
             <p><strong>Status:</strong> <span class="status-${bus.live_status.toLowerCase().replace(' ', '-') || 'unknown'}">${bus.live_status}</span></p>
-            <p><strong>Seats Available:</strong> ${bus.seats_available}/${bus.total_seats}</p>
+            <p><strong>Seats:</strong> ${bus.seats_available}/${bus.total_seats} available</p>
             <p><strong>Next Trip:</strong> ${bus.schedule[0].departure} to ${bus.schedule[0].direction === 'A_to_B' ? (routeDetails ? routeDetails.destination : 'Unknown') : (routeDetails ? routeDetails.origin : 'Unknown')}</p>
-            <a href="/pages/booking.html?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}" class="btn btn-primary btn-sm mt-2">Book Now</a>
           </div>
         `;
         busListElement.appendChild(busElement);
       });
     }
 
+    // Add legend
     const legend = L.control({ position: 'bottomright' });
     legend.onAdd = function() {
       const div = L.DomUtil.create('div', 'legend');
@@ -519,19 +325,20 @@
     };
     legend.addTo(map);
 
+    // Route visibility controls
     document.getElementById('show-routes').addEventListener('click', () => {
       routeControls.forEach(control => {
         control.getPlan().setWaypoints(control.getPlan().getWaypoints());
         control._container.style.display = 'block';
       });
     });
-
     document.getElementById('hide-routes').addEventListener('click', () => {
       routeControls.forEach(control => {
         control._container.style.display = 'none';
       });
     });
 
+    // Update navbar with auth state
     const authLink = document.getElementById('authLink');
     authLink.textContent = 'Loading...';
     onAuthStateChange((user) => {
@@ -555,12 +362,13 @@
       }
     });
 
+    // Initialize the app
     async function init() {
       try {
         const data = await fetchDataFromRealtimeDatabase();
         console.log('Realtime Database data loaded:', data);
-        await processBuses(data);
         updateBusList(data);
+        await processBuses(data);
         if (busMarkers.length > 0) {
           const group = new L.featureGroup(busMarkers);
           map.fitBounds(group.getBounds().pad(0.2));
@@ -569,28 +377,6 @@
         console.error('Initialization error:', error);
       }
     }
-
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = themeToggle.querySelector('i');
-    const currentTheme = localStorage.getItem('theme') || 'dark';
-    if (currentTheme === 'light') {
-      document.body.classList.add('light-theme');
-      themeIcon.classList.remove('fa-moon');
-      themeIcon.classList.add('fa-sun');
-    }
-
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('light-theme');
-      if (document.body.classList.contains('light-theme')) {
-        themeIcon.classList.remove('fa-moon');
-        themeIcon.classList.add('fa-sun');
-        localStorage.setItem('theme', 'light');
-      } else {
-        themeIcon.classList.remove('fa-sun');
-        themeIcon.classList.add('fa-moon');
-        localStorage.setItem('theme', 'dark');
-      }
-    });
 
     document.addEventListener('DOMContentLoaded', init);
   </script>

@@ -6,14 +6,51 @@
   <title>Arka - Trekking</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    body { background: #1a1a3d; color: white; }
+    body { background: #1a1a3d; color: white; font-family: 'Arial', sans-serif; }
     .navbar { background: rgba(0, 0, 0, 0.6); }
     .navbar-brand { font-size: 1.8rem; font-weight: bold; color: #00aaff !important; }
     .nav-link { color: white !important; }
     .nav-link:hover { color: #00aaff !important; }
-    .card { background: rgba(255, 255, 255, 0.1); border: none; }
-    .btn { transition: transform 0.3s ease; }
-    .btn:hover { transform: scale(1.05); }
+    .container { padding-top: 5rem; padding-bottom: 2rem; }
+    .card { background: rgba(255, 255, 255, 0.1); border: none; border-radius: 15px; padding: 1rem; }
+    .btn-primary {
+      background: #00aaff;
+      border: none;
+      transition: transform 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: #0088cc;
+      transform: scale(1.05);
+    }
+    .btn-outline-light {
+      border-color: #00aaff;
+      color: #00aaff;
+      transition: transform 0.3s ease;
+    }
+    .btn-outline-light:hover {
+      background: #00aaff;
+      color: white;
+      transform: scale(1.05);
+    }
+    h1 { font-size: 2.5rem; color: #00aaff; }
+    h5 { font-size: 1.5rem; color: #00aaff; }
+    .modal-content { background: rgba(0, 0, 0, 0.8); color: white; border-radius: 15px; }
+    .modal-header, .modal-footer { border: none; }
+    .modal-title { color: #00aaff; }
+    .form-control {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+    }
+    .form-control:focus {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      box-shadow: none;
+      border-color: #00aaff;
+    }
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+    }
   </style>
 </head>
 <body>
@@ -31,6 +68,7 @@
           <li class="nav-item"><a class="nav-link active" href="/pages/trekking.html">Trekking</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/events.html">Events</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/profile.html">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" id="authLink" href="/Auth.html">Login</a></li>
         </ul>
       </div>
     </div>
@@ -38,55 +76,219 @@
 
   <div class="container mt-5">
     <h1 class="text-center mb-4">Trekking Adventures</h1>
+    <div class="row mb-4">
+      <div class="col-md-6 mb-2">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search by name...">
+      </div>
+      <div class="col-md-6 mb-2">
+        <select class="form-control" id="filterDifficulty">
+          <option value="">All Difficulties</option>
+          <option value="Easy">Easy</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Difficult">Difficult</option>
+        </select>
+      </div>
+    </div>
     <div class="row" id="trekking-container">
       <!-- Dynamic trekking route cards will be inserted here -->
     </div>
   </div>
 
+  <!-- Trekking Details Modal -->
+  <div class="modal fade" id="trekkingModal" tabindex="-1" aria-labelledby="trekkingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="trekkingModalLabel"></h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>District:</strong> <span id="modalDistrict"></span></p>
+          <p><strong>Difficulty:</strong> <span id="modalDifficulty"></span></p>
+          <p><strong>Distance:</strong> <span id="modalDistance"></span> km</p>
+          <p><strong>Weather Advice:</strong> <span id="modalWeather"></span></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Fetch trekking routes data from data.json and render trekking cards
-    fetch('../assets/json/data.json')
-      .then(response => response.json())
-      .then(data => {
-        const trekkingRoutes = data.trekking_routes;
-        const trekkingContainer = document.getElementById('trekking-container');
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+    import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { onAuthStateChange, signOutUser } from '/assets/js/services/auth.js';
 
-        for (const trekId in trekkingRoutes) {
-          if (trekkingRoutes.hasOwnProperty(trekId)) {
-            const trek = trekkingRoutes[trekId];
+    const firebaseConfig = {
+      apiKey: "AIzaSyDkYJtwm9mqrq2zFIIr0DXElYG44WIpswI",
+      authDomain: "arka-5258.firebaseapp.com",
+      databaseURL: "https://arka-5258-default-rtdb.firebaseio.com",
+      projectId: "arka-5258",
+      storageBucket: "arka-5258.firebasestorage.app",
+      messagingSenderId: "378365125891",
+      appId: "1:378365125891:web:43e9ca1df58152d9f8b536",
+      measurementId: "G-2V7TSEBWQ8"
+    };
 
-            const colDiv = document.createElement('div');
-            colDiv.className = 'col-md-4 mb-4';
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const firestore = getFirestore(app);
 
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card text-white p-3 h-100 d-flex flex-column justify-content-between';
+    let allTrekkingRoutes = [];
+    let currentUser = null;
 
-            const title = document.createElement('h5');
-            title.textContent = trek.name;
-            cardDiv.appendChild(title);
-
-            const details = document.createElement('p');
-            details.textContent = `District: ${trek.district} | Difficulty: ${trek.difficulty} | Distance: ${trek.distance_km} km`;
-            cardDiv.appendChild(details);
-
-            const weather = document.createElement('p');
-            weather.textContent = `Weather Advice: ${trek.weather_advice}`;
-            cardDiv.appendChild(weather);
-
-            const button = document.createElement('button');
-            button.className = 'btn btn-primary mt-auto';
-            button.textContent = 'View Trail Map';
-            cardDiv.appendChild(button);
-
-            colDiv.appendChild(cardDiv);
-            trekkingContainer.appendChild(colDiv);
+    // Handle authentication state changes for login/logout
+    const authLink = document.getElementById('authLink');
+    authLink.textContent = 'Loading...';
+    onAuthStateChange((user) => {
+      console.log('Auth state changed:', user ? 'Logged in' : 'Logged out', user);
+      currentUser = user;
+      if (user) {
+        authLink.textContent = 'Signout';
+        authLink.href = '#';
+        authLink.onclick = async () => {
+          try {
+            await signOutUser();
+            console.log('User signed out');
+            window.location.href = '/index.html';
+          } catch (error) {
+            console.error('Logout failed:', error);
           }
-        }
-      })
-      .catch(error => {
-        console.error('Error loading trekking data:', error);
+        };
+      } else {
+        authLink.textContent = 'Login';
+        authLink.href = '/Auth.html';
+        authLink.onclick = null;
+      }
+      renderTrekkingRoutes(); // Re-render to update "Save" button visibility
+    });
+
+    // Save trekking route to user's profile
+    async function saveTrekkingRoute(trekId, trek) {
+      if (!currentUser) {
+        alert('Please log in to save trekking routes.');
+        window.location.href = '/Auth.html';
+        return;
+      }
+      try {
+        const userDocRef = doc(firestore, 'users', currentUser.uid);
+        await setDoc(userDocRef, {
+          saved_treks: {
+            [trekId]: {
+              name: trek.name,
+              district: trek.district,
+              difficulty: trek.difficulty,
+              distance_km: trek.distance_km,
+              weather_advice: trek.weather_advice
+            }
+          }
+        }, { merge: true });
+        alert(`${trek.name} has been saved to your profile!`);
+      } catch (error) {
+        console.error('Error saving trekking route:', error);
+        alert('Failed to save the trek. Please try again.');
+      }
+    }
+
+    // Show trekking route details in modal
+    function showTrekkingDetails(trek) {
+      document.getElementById('trekkingModalLabel').textContent = trek.name;
+      document.getElementById('modalDistrict').textContent = trek.district;
+      document.getElementById('modalDifficulty').textContent = trek.difficulty;
+      document.getElementById('modalDistance').textContent = trek.distance_km;
+      document.getElementById('modalWeather').textContent = trek.weather_advice;
+      const modal = new bootstrap.Modal(document.getElementById('trekkingModal'));
+      modal.show();
+    }
+
+    // Render trekking routes
+    function renderTrekkingRoutes() {
+      const trekkingContainer = document.getElementById('trekking-container');
+      trekkingContainer.innerHTML = '';
+
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      const filterDifficulty = document.getElementById('filterDifficulty').value;
+
+      const filteredTreks = allTrekkingRoutes.filter(trek => {
+        const matchesSearch = trek.name.toLowerCase().includes(searchQuery);
+        const matchesDifficulty = filterDifficulty ? trek.difficulty === filterDifficulty : true;
+        return matchesSearch && matchesDifficulty;
       });
+
+      if (filteredTreks.length === 0) {
+        trekkingContainer.innerHTML = '<p class="text-center">No trekking routes found.</p>';
+        return;
+      }
+
+      filteredTreks.forEach((trek, trekId) => {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-md-4 mb-4';
+
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card text-white h-100 d-flex flex-column';
+
+        const cardBody = document.createElement('div');
+        cardBody.className = 'p-3 flex-grow-1 d-flex flex-column';
+
+        const title = document.createElement('h5');
+        title.textContent = trek.name;
+        cardBody.appendChild(title);
+
+        const details = document.createElement('p');
+        details.textContent = `District: ${trek.district} | Difficulty: ${trek.difficulty} | Distance: ${trek.distance_km} km`;
+        cardBody.appendChild(details);
+
+        const weather = document.createElement('p');
+        weather.textContent = `Weather Advice: ${trek.weather_advice}`;
+        cardBody.appendChild(weather);
+
+        const buttonGroup = document.createElement('div');
+        buttonGroup.className = 'mt-auto d-flex gap-2';
+
+        const detailsButton = document.createElement('button');
+        detailsButton.className = 'btn btn-primary flex-grow-1';
+        detailsButton.textContent = 'View Details';
+        detailsButton.onclick = () => showTrekkingDetails(trek);
+        buttonGroup.appendChild(detailsButton);
+
+        if (currentUser) {
+          const saveButton = document.createElement('button');
+          saveButton.className = 'btn btn-outline-light';
+          saveButton.textContent = 'Save';
+          saveButton.onclick = () => saveTrekkingRoute(trekId, trek);
+          buttonGroup.appendChild(saveButton);
+        }
+
+        cardBody.appendChild(buttonGroup);
+        cardDiv.appendChild(cardBody);
+        colDiv.appendChild(cardDiv);
+        trekkingContainer.appendChild(colDiv);
+      });
+    }
+
+    // Fetch trekking routes data from Firebase Realtime Database
+    function fetchTrekkingRoutes() {
+      const trekkingRef = ref(database, 'trekking_routes');
+      onValue(trekkingRef, (snapshot) => {
+        const trekkingRoutes = snapshot.val() || {};
+        console.log('Trekking routes fetched:', trekkingRoutes);
+        allTrekkingRoutes = Object.entries(trekkingRoutes).map(([trekId, trek]) => ({ ...trek, trekId }));
+        renderTrekkingRoutes();
+      }, (error) => {
+        console.error('Error fetching trekking data:', error);
+        document.getElementById('trekking-container').innerHTML = '<p class="text-center text-danger">Error loading trekking data. Please try again later.</p>';
+      });
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchTrekkingRoutes();
+      document.getElementById('searchInput').addEventListener('input', renderTrekkingRoutes);
+      document.getElementById('filterDifficulty').addEventListener('change', renderTrekkingRoutes);
+    });
   </script>
 </body>
 </html>

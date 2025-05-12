@@ -3,72 +3,1081 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arka - Book Tickets</title>
+  <title>Arka - Book Bus Tickets</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { background: #1a1a3d; color: white; }
-    .navbar { background: rgba(0, 0, 0, 0.6); }
-    .navbar-brand { font-size: 1.8rem; font-weight: bold; color: #00aaff !important; }
-    .nav-link { color: white !important; }
-    .nav-link:hover { color: #00aaff !important; }
-    .form-control { background: rgba(255, 255, 255, 0.1); color: white; border: none; }
-    .btn { transition: transform 0.3s ease; }
-    .btn:hover { transform: scale(1.05); }
+    :root {
+      --primary: #f59e0b;
+      --secondary: #1a3c34;
+      --accent: #00aaff;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, var(--secondary), #d97706);
+      color: white;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 0.5rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent) !important;
+    }
+
+    .nav-link {
+      color: white !important;
+      font-size: 1rem;
+      padding: 0.5rem 1rem !important;
+    }
+
+    .nav-link:hover {
+      color: var(--primary) !important;
+    }
+
+    .dropdown-menu {
+      background: rgba(0, 0, 0, 0.9);
+      border: none;
+    }
+
+    .dropdown-item {
+      color: white;
+    }
+
+    .dropdown-item:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .hero-section {
+      position: relative;
+      height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: url('https://source.unsplash.com/1600x900/?bus,travel') no-repeat center/cover;
+      overflow: hidden;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1;
+    }
+
+    .hero-content {
+      z-index: 2;
+    }
+
+    .hero-content h1 {
+      font-size: 3rem;
+      color: var(--primary);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .search-container, .booking-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 1s ease-in;
+    }
+
+    .form-control {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      border-radius: 10px;
+      padding: 0.75rem;
+    }
+
+    .form-control:focus {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      box-shadow: 0 0 5px var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem 2rem;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: #b91c1c;
+      transform: scale(1.05);
+    }
+
+    .btn-outline-light {
+      border-color: var(--primary);
+      color: var(--primary);
+      border-radius: 10px;
+    }
+
+    .btn-outline-light:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .bus-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .bus-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .seat {
+      width: 40px;
+      height: 40px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .seat.available { background: #28a745; }
+    .seat.selected { background: var(--primary); }
+    .seat.occupied { background: #b91c1c; cursor: not-allowed; }
+    .seat:hover:not(.occupied) { transform: scale(1.1); }
+
+    .modal-content {
+      background: rgba(0, 0, 0, 0.9);
+      border-radius: 15px;
+      color: white;
+    }
+
+    .modal-title { color: var(--primary); }
+    .modal-header, .modal-footer { border: none; }
+
+    .qr-code {
+      max-width: 200px;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    }
+
+    .loading-spinner {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1001;
+    }
+
+    .error-message {
+      color: #b91c1c;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    .recent-searches {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .recent-searches a {
+      color: var(--primary);
+      text-decoration: none;
+      margin-right: 1rem;
+    }
+
+    .recent-searches a:hover {
+      text-decoration: underline;
+    }
+
+    .advanced-filters {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .amenity-icon {
+      font-size: 1.2rem;
+      margin-right: 0.5rem;
+      color: var(--primary);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .hero-section { height: 50vh; }
+      .hero-content h1 { font-size: 2rem; }
+      .navbar-brand { font-size: 1.2rem; }
+      .nav-link { font-size: 0.9rem; }
+      .search-container, .booking-container { padding: 1.5rem; }
+    }
+
+    @media (max-width: 576px) {
+      .hero-content h1 { font-size: 1.5rem; }
+      .navbar { padding: 0.5rem; }
+      .search-container, .booking-container { padding: 1rem; }
+      .btn-primary { padding: 0.5rem 1.5rem; }
+    }
   </style>
 </head>
 <body>
+  <div id="loading-spinner" class="loading-spinner text-white">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
   <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
+    <div class="container-fluid">
       <a class="navbar-brand" href="/index.html">Arka</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center">
           <li class="nav-item"><a class="nav-link" href="/pages/bus-tracking.html">Bus Tracking</a></li>
           <li class="nav-item"><a class="nav-link active" href="/pages/booking.html">Book Tickets</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/tourism.html">Tourism</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/trekking.html">Trekking</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/events.html">Events</a></li>
-          <li class="nav-item"><a class="nav-link" href="/pages/profile.html">Profile</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user"></i> <span id="profileName">Profile</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <li><a class="dropdown-item" id="authLink" href="/Auth.html">Login</a></li>
+              <li><a class="dropdown-item" href="/pages/profile.html">View Profile</a></li>
+              <li><a class="dropdown-item" href="#" id="signOutLink" style="display: none;">Sign Out</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <select id="languageToggle" class="form-select bg-dark text-white border-0" style="width: auto;">
+              <option value="en">English</option>
+              <option value="hi">हिन्दी</option>
+            </select>
+          </li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <div class="container mt-5">
-    <h1 class="text-center mb-4">Book Your Bus Ticket</h1>
-    <form class="row g-3">
-      <div class="col-md-6">
-        <label for="from" class="form-label">From</label>
-        <input type="text" class="form-control" id="from" placeholder="e.g., Puri">
+  <div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Travel Easy with Arka</h1>
+      <p class="lead">Book your bus tickets in just a few clicks!</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="search-container" id="searchContainer">
+      <h2 class="text-center mb-4">Find Your Bus</h2>
+      <form id="searchForm" class="row g-3 align-items-center">
+        <div class="col-md-4">
+          <label for="from" class="form-label">From</label>
+          <select class="form-control" id="from" required aria-label="Departure city">
+            <option value="" disabled selected>Kaha se?</option>
+          </select>
+        </div>
+        <div class="col-md-1 text-center">
+          <button type="button" class="btn btn-outline-light" id="swapCities" title="Swap cities">
+            <i class="fas fa-exchange-alt"></i>
+          </button>
+        </div>
+        <div class="col-md-4">
+          <label for="to" class="form-label">To</label>
+          <select class="form-control" id="to" required aria-label="Destination city">
+            <option value="" disabled selected>Kaha jana hai?</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="startDate" class="form-label">Travel Date</label>
+          <input type="date" class="form-control" id="startDate" required aria-label="Travel date">
+        </div>
+        <div class="col-12 text-center">
+          <button type="button" class="btn btn-link text-white" id="toggleFilters">Advanced Filters <i class="fas fa-chevron-down"></i></button>
+        </div>
+        <div class="col-12 advanced-filters" id="advancedFilters">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="busType" class="form-label">Bus Type</label>
+              <select class="form-control" id="busType" aria-label="Bus type">
+                <option value="">All</option>
+                <option value="AC">AC</option>
+                <option value="Non-AC">Non-AC</option>
+                <option value="Sleeper">Sleeper</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="timeSlot" class="form-label">Time Slot</label>
+              <select class="form-control" id="timeSlot" aria-label="Preferred time slot">
+                <option value="">Any Time</option>
+                <option value="Morning">Morning (6 AM - 12 PM)</option>
+                <option value="Afternoon">Afternoon (12 PM - 6 PM)</option>
+                <option value="Evening">Evening (6 PM - 12 AM)</option>
+                <option value="Night">Night (12 AM - 6 AM)</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="sortBy" class="form-label">Sort By</label>
+              <select class="form-control" id="sortBy" aria-label="Sort results by">
+                <option value="departure">Departure Time</option>
+                <option value="price">Price</option>
+                <option value="seats">Seats Available</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 text-center">
+          <button type="submit" class="btn btn-primary btn-lg">Search Buses</button>
+        </div>
+      </form>
+      <div class="search-container" id="searchContainer">
+  <h2 class="text-center mb-4">Find Your Bus</h2>
+  <form id="searchForm" class="row g-3 align-items-center">
+    <!-- ... existing form content ... -->
+  </form>
+  <div class="recent-searches" id="recentSearches"></div>
+  <div id="busResults" class="mt-4"></div>
+  <p class="error-message" id="errorMessage"></p>
+  <!-- Add new section for all routes -->
+  <div id="allRoutes" class="mt-4">
+    <h3 class="text-center mb-4" style="color: var(--primary);">All Available Routes</h3>
+    <div id="routeCards"></div>
+  </div>
+</div>
+      <div class="recent-searches" id="recentSearches"></div>
+      <div id="busResults" class="mt-4"></div>
+      <p class="error-message" id="errorMessage"></p>
+    </div>
+
+    <div class="booking-container" id="bookingContainer" style="display: none;">
+      <h2 class="text-center mb-4">Book Your Ticket</h2>
+      <div id="selectedBusDetails" class="bus-card mb-4"></div>
+      <form id="bookingForm" class="row g-3">
+        <div class="col-md-6">
+          <label for="seats" class="form-label">Number of Seats</label>
+          <select class="form-control" id="seats" required aria-label="Number of seats">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="passengerName" class="form-label">Passenger Name</label>
+          <input type="text" class="form-control" id="passengerName" placeholder="Enter full name" required aria-label="Passenger name">
+        </div>
+        <div class="col-md-6">
+          <label for="passengerEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="passengerEmail" placeholder="Enter email" required aria-label="Passenger email">
+        </div>
+        <div class="col-md-6">
+          <label for="passengerPhone" class="form-label">Phone Number</label>
+          <input type="tel" class="form-control" id="passengerPhone" placeholder="Enter phone number" required aria-label="Passenger phone number">
+        </div>
+        <div class="col-md-6">
+          <label for="promoCode" class="form-label">Promo Code</label>
+          <input type="text" class="form-control" id="promoCode" placeholder="Enter promo code" aria-label="Promo code">
+        </div>
+        <div class="col-12 text-center">
+          <button type="button" class="btn btn-outline-light me-2" id="backToSearch">Back to Search</button>
+          <button type="submit" class="btn btn-primary btn-lg">Select Seats</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Seat Selection Modal -->
+  <div class="modal fade" id="seatModal" tabindex="-1" aria-labelledby="seatModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="seatModalLabel">Select Your Seats</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="seatMap" class="d-flex flex-wrap justify-content-center"></div>
+          <p class="mt-3">Selected Seats: <span id="selectedSeats">0</span> / <span id="requiredSeats">0</span></p>
+          <p>Total Cost: ₹<span id="totalCost">0</span></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="proceedToPay">Proceed to Pay</button>
+        </div>
       </div>
-      <div class="col-md-6">
-        <label for="to" class="form-label">To</label>
-        <input type="text" class="form-control" id="to" placeholder="e.g., Bhubaneswar">
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="paymentModalLabel">Payment</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Total Amount: ₹<span id="paymentAmount">0</span></p>
+          <div class="mb-3">
+            <label for="paymentMethod" class="form-label">Payment Method</label>
+            <select class="form-control" id="paymentMethod" aria-label="Payment method">
+              <option value="upi">UPI</option>
+              <option value="card">Credit/Debit Card</option>
+            </select>
+          </div>
+          <div id="upiFields" class="mb-3">
+            <label for="upiId" class="form-label">UPI ID</label>
+            <input type="text" class="form-control" id="upiId" placeholder="example@upi" aria-label="UPI ID">
+          </div>
+          <div id="cardFields" class="mb-3" style="display: none;">
+            <label for="cardNumber" class="form-label">Card Number</label>
+            <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" aria-label="Card number">
+            <label for="expiry" class="form-label mt-2">Expiry Date</label>
+            <input type="text" class="form-control" id="expiry" placeholder="MM/YY" aria-label="Expiry date">
+            <label for="cvv" class="form-label mt-2">CVV</label>
+            <input type="text" class="form-control" id="cvv" placeholder="123" aria-label="CVV">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirmPayment">Confirm Payment</button>
+        </div>
       </div>
-      <div class="col-md-6">
-        <label for="date" class="form-label">Date</label>
-        <input type="date" class="form-control" id="date">
+    </div>
+  </div>
+
+  <!-- Ticket Modal -->
+  <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ticketModalLabel">Your Ticket</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p><strong>Route:</strong> <span id="ticketRoute"></span></p>
+          <p><strong>Date:</strong> <span id="ticketDate"></span></p>
+          <p><strong>Departure Time:</strong> <span id="ticketDepartureTime"></span></p>
+          <p><strong>Seats:</strong> <span id="ticketSeats"></span></p>
+          <p><strong>Passenger:</strong> <span id="ticketPassenger"></span></p>
+          <p><strong>Total Paid:</strong> ₹<span id="ticketAmount"></span></p>
+          <img id="qrCode" class="qr-code" alt="QR Code">
+          <p class="mt-3">Scan this QR code at the bus for boarding.</p>
+          <a href="/pages/bus-tracking.html" class="btn btn-outline-light mt-2">Track Your Bus</a>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
-      <div class="col-md-6">
-        <label for="seats" class="form-label">Seats</label>
-        <select class="form-control" id="seats">
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-        </select>
-      </div>
-      <div class="col-12 text-center">
-        <button type="submit" class="btn btn-primary btn-lg">Search Buses</button>
-      </div>
-    </form>
-    <div class="mt-4 text-center">
-      <p>After search: Select your seat → Pay via UPI/Card → Get QR Ticket</p>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getDatabase, ref, onValue, set } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+    import { onAuthStateChange, signOutUser } from '/assets/js/services/auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDkYJtwm9mqrq2zFIIr0DXElYG44WIpswI",
+      authDomain: "arka-5258.firebaseapp.com",
+      databaseURL: "https://arka-5258-default-rtdb.firebaseio.com",
+      projectId: "arka-5258",
+      storageBucket: "arka-5258.firebasestorage.app",
+      messagingSenderId: "378365125891",
+      appId: "1:378365125891:web:43e9ca1df58152d9f8b536",
+      measurementId: "G-2V7TSEBWQ8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    let currentUser = null;
+    let selectedBus = null;
+    let selectedSeats = [];
+    let selectedDepartureTime = null;
+    let ticketPricePerSeat = 100;
+
+    // Language toggle
+    const translations = {
+      en: {
+        from: "From",
+        to: "To",
+        travelDate: "Travel Date",
+        searchBuses: "Search Buses",
+        recentSearches: "Recent Searches",
+        advancedFilters: "Advanced Filters",
+        bookTicket: "Book Your Ticket",
+        selectSeats: "Select Seats",
+        passengerName: "Passenger Name",
+        passengerEmail: "Email",
+        passengerPhone: "Phone Number",
+        promoCode: "Promo Code",
+        backToSearch: "Back to Search"
+      },
+      hi: {
+        from: "कहाँ से",
+        to: "कहाँ जाना है",
+        travelDate: "यात्रा की तारीख",
+        searchBuses: "बस खोजें",
+        recentSearches: "हाल की खोज",
+        advancedFilters: "उन्नत फ़िल्टर",
+        bookTicket: "अपना टिकट बुक करें",
+        selectSeats: "सीटें चुनें",
+        passengerName: "यात्री का नाम",
+        passengerEmail: "ईमेल",
+        passengerPhone: "फोन नंबर",
+        promoCode: "प्रोमो कोड",
+        backToSearch: "वापस खोजें"
+      }
+    };
+
+    let currentLang = 'en';
+
+    function updateLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll('[data-lang]').forEach(el => {
+        const key = el.getAttribute('data-lang');
+        el.textContent = translations[lang][key] || el.textContent;
+      });
+      document.getElementById('from').setAttribute('aria-label', translations[lang].from);
+      document.getElementById('to').setAttribute('aria-label', translations[lang].to);
+    }
+
+    document.getElementById('languageToggle').addEventListener('change', (e) => {
+      updateLanguage(e.target.value);
+    });
+
+    // Authentication
+    const authLink = document.getElementById('authLink');
+    const signOutLink = document.getElementById('signOutLink');
+    const profileName = document.getElementById('profileName');
+    authLink.textContent = 'Login';
+    onAuthStateChange((user) => {
+      currentUser = user;
+      if (user) {
+        profileName.textContent = user.displayName || 'User';
+        authLink.style.display = 'none';
+        signOutLink.style.display = 'block';
+        signOutLink.onclick = async () => {
+          try {
+            await signOutUser();
+            window.location.href = '/index.html';
+          } catch (error) {
+            document.getElementById('errorMessage').textContent = `Failed to log out: ${error.message}`;
+          }
+        };
+      } else {
+        profileName.textContent = 'Profile';
+        authLink.style.display = 'block';
+        signOutLink.style.display = 'none';
+      }
+    });
+
+    function showLoading() {
+      document.getElementById('loading-spinner').style.display = 'block';
+    }
+
+    function hideLoading() {
+      document.getElementById('loading-spinner').style.display = 'none';
+    }
+
+    async function fetchData() {
+      showLoading();
+      return new Promise((resolve, reject) => {
+        const routesRef = ref(database, 'routes');
+        const busesRef = ref(database, 'buses');
+        const data = { routes: {}, buses: {} };
+
+        onValue(routesRef, (snapshot) => {
+          data.routes = snapshot.val() || {};
+          onValue(busesRef, (snapshot) => {
+            data.buses = snapshot.val() || {};
+            hideLoading();
+            resolve(data);
+          }, (error) => {
+            reject(error);
+          });
+        }, (error) => {
+          reject(error);
+        });
+      });
+    }
+
+    function populateDropdowns(data) {
+      const fromSelect = document.getElementById('from');
+      const toSelect = document.getElementById('to');
+      const cities = new Set();
+
+      Object.values(data.routes).forEach(route => {
+        cities.add(route.origin);
+        cities.add(route.destination);
+      });
+
+      fromSelect.innerHTML = '<option value="" disabled selected>Kaha se?</option>';
+      toSelect.innerHTML = '<option value="" disabled selected>Kaha jana hai?</option>';
+
+      cities.forEach(city => {
+        const optionFrom = document.createElement('option');
+        optionFrom.value = city;
+        optionFrom.textContent = city;
+        fromSelect.appendChild(optionFrom);
+
+        const optionTo = document.createElement('option');
+        optionTo.value = city;
+        optionTo.textContent = city;
+        toSelect.appendChild(optionTo);
+      });
+    }
+
+    // Recent Searches
+    function loadRecentSearches() {
+      const searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+      const recentSearchesDiv = document.getElementById('recentSearches');
+      recentSearchesDiv.innerHTML = '<strong data-lang="recentSearches">Recent Searches:</strong> ';
+      searches.forEach(search => {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = `${search.from} to ${search.to}`;
+        link.onclick = () => {
+          document.getElementById('from').value = search.from;
+          document.getElementById('to').value = search.to;
+          document.getElementById('startDate').value = search.date;
+          document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+        };
+        recentSearchesDiv.appendChild(link);
+      });
+    }
+
+    function saveRecentSearch(from, to, date) {
+      const searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+      searches.unshift({ from, to, date });
+      if (searches.length > 5) searches.pop();
+      localStorage.setItem('recentSearches', JSON.stringify(searches));
+      loadRecentSearches();
+    }
+
+    // Swap Cities
+    document.getElementById('swapCities').addEventListener('click', () => {
+      const from = document.getElementById('from').value;
+      const to = document.getElementById('to').value;
+      document.getElementById('from').value = to;
+      document.getElementById('to').value = from;
+    });
+
+    // Toggle Advanced Filters
+    document.getElementById('toggleFilters').addEventListener('click', () => {
+      const advancedFilters = document.getElementById('advancedFilters');
+      const icon = document.getElementById('toggleFilters').querySelector('i');
+      advancedFilters.style.display = advancedFilters.style.display === 'block' ? 'none' : 'block';
+      icon.classList.toggle('fa-chevron-down');
+      icon.classList.toggle('fa-chevron-up');
+    });
+
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!currentUser) {
+    alert('Please log in to search for buses.');
+    return;
+  }
+
+  showLoading();
+  const from = document.getElementById('from').value;
+  const to = document.getElementById('to').value;
+  const startDate = document.getElementById('startDate').value;
+  const busType = document.getElementById('busType').value;
+  const timeSlot = document.getElementById('timeSlot').value;
+  const sortBy = document.getElementById('sortBy').value;
+
+  if (from === to) {
+    alert('Departure and destination cities cannot be the same.');
+    hideLoading();
+    return;
+  }
+
+  saveRecentSearch(from, to, startDate);
+
+  try {
+    const data = await fetchData();
+    const busResults = document.getElementById('busResults');
+    busResults.innerHTML = '<h3 class="text-center mb-4" style="color: var(--primary);">Available Buses</h3>';
+
+    let buses = [];
+
+    Object.entries(data.buses).forEach(([busId, bus]) => {
+      const route = Object.values(data.routes).find(r => 
+        `${r.origin} - ${r.destination}` === bus.route || 
+        `${r.destination} - ${r.origin}` === bus.route
+      );
+
+      if (!route) return;
+
+      const routeMatches = 
+        (route.origin === from && route.destination === to) ||
+        (route.origin === to && route.destination === from);
+      if (!routeMatches) return;
+
+      if (busType && bus.bus_type !== busType) return;
+
+      if (!bus.schedule || !Array.isArray(bus.schedule)) return; // Add check for schedule
+
+      bus.schedule.forEach(schedule => {
+        const departureTime = schedule.departure_time;
+        // Add check for departure_time
+        if (!departureTime || typeof departureTime !== 'string') return;
+
+        const hour = parseInt(departureTime.split(':')[0]);
+
+        let showSchedule = true;
+        if (timeSlot) {
+          showSchedule = 
+            (timeSlot === 'Morning' && hour >= 6 && hour < 12) ||
+            (timeSlot === 'Afternoon' && hour >= 12 && hour < 18) ||
+            (timeSlot === 'Evening' && hour >= 18 && hour < 24) ||
+            (timeSlot === 'Night' && (hour >= 0 && hour < 6));
+        }
+
+        if (showSchedule) {
+          buses.push({
+            id: busId,
+            ...bus,
+            selectedSchedule: schedule,
+            routeData: route,
+            ticketPrice: route.ticket_price || ticketPricePerSeat,
+            amenities: bus.amenities || ['AC', 'Charging']
+          });
+        }
+      });
+    });
+
+    buses.sort((a, b) => {
+      if (sortBy === 'price') {
+        return a.ticketPrice - b.ticketPrice;
+      } else if (sortBy === 'seats') {
+        return b.seats_available - a.seats_available;
+      } else {
+        return a.selectedSchedule.departure_time.localeCompare(b.selectedSchedule.arrival_time);
+      }
+    });
+
+    if (buses.length === 0) {
+      busResults.innerHTML += `
+        <div class="text-center">
+          <p>No buses found for the selected route.</p>
+          <p><strong>Suggestions:</strong></p>
+          <ul class="text-start">
+            <li>Try selecting a different route</li>
+            <li>Select "Any Time" for more options</li>
+            <li>Choose different bus types</li>
+          </ul>
+        </div>
+      `;
+      hideLoading();
+      return;
+    }
+
+    buses.forEach(bus => {
+      const busCard = document.createElement('div');
+      busCard.className = 'bus-card';
+      busCard.innerHTML = `
+        <h5>${bus.route}</h5>
+        <p><strong>Departure:</strong> ${bus.selectedSchedule.departure_time}</p>
+        <p><strong>Arrival:</strong> ${bus.selectedSchedule.arrival_time}</p>
+        <p><strong>Seats Available:</strong> ${bus.seats_available}/${bus.total_seats}</p>
+        <p><strong>Bus Type:</strong> ${bus.bus_type || 'Standard'}</p>
+        <p><strong>Amenities:</strong> ${bus.amenities.map(a => `<i class="fas fa-${a === 'AC' ? 'snowflake' : 'plug'} amenity-icon"></i>${a}`).join(', ')}</p>
+        <p><strong>Price per Seat:</strong> ₹${bus.ticketPrice}</p>
+        <button class="btn btn-primary select-bus" 
+                data-bus-id="${bus.id}" 
+                data-departure-time="${bus.selectedSchedule.departure_time}"
+                data-ticket-price="${bus.ticketPrice}"
+                aria-label="Book bus from ${bus.route}">Book Now</button>
+      `;
+      busResults.appendChild(busCard);
+    });
+
+    document.querySelectorAll('.select-bus').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const busId = e.target.dataset.busId;
+        selectedBus = buses.find(bus => bus.id === busId);
+        selectedDepartureTime = e.target.dataset.departureTime;
+        ticketPricePerSeat = parseFloat(e.target.dataset.ticketPrice);
+        showBookingSection();
+      });
+    });
+
+    hideLoading();
+  } catch (error) {
+    document.getElementById('busResults').innerHTML = `
+      <div class="text-center text-danger">
+        <p>Error fetching buses: ${error.message}</p>
+        <button class="btn btn-outline-light" id="retrySearch">Retry</button>
+      </div>
+    `;
+    hideLoading();
+    document.getElementById('retrySearch').addEventListener('click', () => {
+      document.getElementById('busResults').innerHTML = '';
+      document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+    });
+  }
+});
+    function showBookingSection() {
+      document.getElementById('searchContainer').style.display = 'none';
+      document.getElementById('bookingContainer').style.display = 'block';
+      const busDetails = document.getElementById('selectedBusDetails');
+      busDetails.innerHTML = `
+        <h5>${selectedBus.route}</h5>
+        <p><strong>Departure:</strong> ${selectedBus.selectedSchedule.departure_time}</p>
+        <p><strong>Arrival:</strong> ${selectedBus.selectedSchedule.arrival_time}</p>
+        <p><strong>Bus Type:</strong> ${selectedBus.bus_type || 'Standard'}</p>
+        <p><strong>Amenities:</strong> ${selectedBus.amenities.map(a => `<i class="fas fa-${a === 'AC' ? 'snowflake' : 'plug'} amenity-icon"></i>${a}`).join(', ')}</p>
+        <p><strong>Price per Seat:</strong> ₹${selectedBus.ticketPrice}</p>
+      `;
+    }
+
+    document.getElementById('backToSearch').addEventListener('click', () => {
+      document.getElementById('bookingContainer').style.display = 'none';
+      document.getElementById('searchContainer').style.display = 'block';
+    });
+
+    document.getElementById('bookingForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const seats = parseInt(document.getElementById('seats').value);
+      if (seats > selectedBus.seats_available) {
+        alert('Not enough seats available.');
+        return;
+      }
+      showSeatSelection(seats);
+    });
+
+    function showSeatSelection(requiredSeats) {
+      const seatMap = document.getElementById('seatMap');
+      seatMap.innerHTML = '';
+      selectedSeats = [];
+      const totalSeats = selectedBus.total_seats;
+      const occupiedSeats = totalSeats - selectedBus.seats_available;
+
+      for (let i = 1; i <= totalSeats; i++) {
+        const seat = document.createElement('div');
+        seat.className = 'seat';
+        seat.dataset.seatNumber = i;
+        seat.setAttribute('aria-label', `Seat ${i}`);
+        seat.setAttribute('role', 'button');
+        if (i <= occupiedSeats) {
+          seat.classList.add('occupied');
+          seat.setAttribute('aria-disabled', 'true');
+        } else {
+          seat.classList.add('available');
+          seat.addEventListener('click', () => {
+            if (seat.classList.contains('selected')) {
+              seat.classList.remove('selected');
+              selectedSeats = selectedSeats.filter(s => s !== i);
+            } else if (selectedSeats.length < requiredSeats) {
+              seat.classList.add('selected');
+              selectedSeats.push(i);
+            } else {
+              alert(`You can only select ${requiredSeats} seats.`);
+            }
+            updateSeatSelectionUI(requiredSeats);
+          });
+        }
+        seatMap.appendChild(seat);
+      }
+
+      updateSeatSelectionUI(requiredSeats);
+      const seatModal = new bootstrap.Modal(document.getElementById('seatModal'));
+      seatModal.show();
+    }
+
+    function updateSeatSelectionUI(requiredSeats) {
+      document.getElementById('selectedSeats').textContent = selectedSeats.length;
+      document.getElementById('requiredSeats').textContent = requiredSeats;
+      document.getElementById('totalCost').textContent = (selectedSeats.length * ticketPricePerSeat).toFixed(2);
+    }
+
+    document.getElementById('proceedToPay').addEventListener('click', () => {
+      if (selectedSeats.length !== parseInt(document.getElementById('requiredSeats').textContent)) {
+        alert('Please select the required number of seats.');
+        return;
+      }
+
+      const seatModal = bootstrap.Modal.getInstance(document.getElementById('seatModal'));
+      seatModal.hide();
+
+      document.getElementById('paymentAmount').textContent = (selectedSeats.length * ticketPricePerSeat).toFixed(2);
+      const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+      paymentModal.show();
+    });
+
+    document.getElementById('paymentMethod').addEventListener('change', (e) => {
+      const upiFields = document.getElementById('upiFields');
+      const cardFields = document.getElementById('cardFields');
+      if (e.target.value === 'upi') {
+        upiFields.style.display = 'block';
+        cardFields.style.display = 'none';
+      } else {
+        upiFields.style.display = 'none';
+        cardFields.style.display = 'block';
+      }
+    });
+
+    document.getElementById('confirmPayment').addEventListener('click', async () => {
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      let isValid = true;
+
+      if (paymentMethod === 'upi') {
+        const upiId = document.getElementById('upiId').value;
+        if (!upiId || !upiId.includes('@')) {
+          alert('Please enter a valid UPI ID (e.g., example@upi).');
+          isValid = false;
+        }
+      } else {
+        const cardNumber = document.getElementById('cardNumber').value;
+        const expiry = document.getElementById('expiry').value;
+        const cvv = document.getElementById('cvv').value;
+        if (!cardNumber || !expiry || !cvv || cardNumber.length < 16 || !expiry.match(/^\d{2}\/\d{2}$/) || cvv.length !== 3) {
+          alert('Please enter valid card details (16-digit card number, MM/YY expiry, 3-digit CVV).');
+          isValid = false;
+        }
+      }
+
+      if (!isValid) return;
+
+      try {
+        const newSeatsAvailable = selectedBus.seats_available - selectedSeats.length;
+        await set(ref(database, `buses/${selectedBus.id}/seats_available`), newSeatsAvailable);
+
+        const ticketData = {
+          userId: currentUser.uid,
+          busId: selectedBus.id,
+          route: selectedBus.route,
+          date: document.getElementById('startDate').value,
+          departure_time: selectedDepartureTime,
+          seats: selectedSeats.map(seat => `Seat ${seat}`),
+          passengerName: document.getElementById('passengerName').value,
+          passengerEmail: document.getElementById('passengerEmail').value,
+          passengerPhone: document.getElementById('passengerPhone').value,
+          amount: selectedSeats.length * ticketPricePerSeat,
+          timestamp: new Date().toISOString()
+        };
+
+        const ticketId = Date.now().toString();
+        await set(ref(database, `tickets/${ticketId}`), ticketData);
+
+        const qrData = JSON.stringify(ticketData);
+        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+
+        document.getElementById('ticketRoute').textContent = ticketData.route;
+        document.getElementById('ticketDate').textContent = ticketData.date;
+        document.getElementById('ticketDepartureTime').textContent = ticketData.departure_time;
+        document.getElementById('ticketSeats').textContent = ticketData.seats.join(', ');
+        document.getElementById('ticketPassenger').textContent = ticketData.passengerName;
+        document.getElementById('ticketAmount').textContent = ticketData.amount.toFixed(2);
+        document.getElementById('qrCode').src = qrCodeUrl;
+
+        const paymentModal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+        paymentModal.hide();
+
+        const ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+        ticketModal.show();
+      } catch (error) {
+        alert(`Error processing payment: ${error.message}. Please try again.`);
+      }
+    });
+
+    async function init() {
+  try {
+    const data = await fetchData();
+    populateDropdowns(data);
+    loadRecentSearches();
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('startDate').setAttribute('min', today);
+    updateLanguage('en');
+
+    // Add toggleFilters event listener
+    document.getElementById('toggleFilters').addEventListener('click', () => {
+      const advancedFilters = document.getElementById('advancedFilters');
+      const icon = document.getElementById('toggleFilters').querySelector('i');
+      advancedFilters.style.display = advancedFilters.style.display === 'block' ? 'none' : 'block';
+      if (icon) {
+        icon.classList.toggle('fa-chevron-down');
+        icon.classList.toggle('fa-chevron-up');
+      }
+    });
+
+    // Display all routes
+    const routeCards = document.getElementById('routeCards');
+    routeCards.innerHTML = ''; // Clear any existing content
+    const routes = Object.values(data.routes);
+    if (routes.length === 0) {
+      routeCards.innerHTML = '<p class="text-center">No routes available.</p>';
+    } else {
+      routes.forEach(route => {
+        const routeCard = document.createElement('div');
+        routeCard.className = 'bus-card';
+        routeCard.innerHTML = `
+          <h5>${route.origin} to ${route.destination}</h5>
+          <p><strong>Ticket Price:</strong> ₹${route.ticket_price || ticketPricePerSeat}</p>
+          <button class="btn btn-primary select-route" 
+                  data-origin="${route.origin}" 
+                  data-destination="${route.destination}" 
+                  aria-label="Search buses from ${route.origin} to ${route.destination}">
+            Search Buses
+          </button>
+        `;
+        routeCards.appendChild(routeCard);
+      });
+
+      // Add event listeners to route cards
+      document.querySelectorAll('.select-route').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const origin = e.target.dataset.origin;
+          const destination = e.target.dataset.destination;
+          // Auto-fill the form and trigger a search
+          document.getElementById('from').value = origin;
+          document.getElementById('to').value = destination;
+          document.getElementById('startDate').value = today;
+          document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+        });
+      });
+    }
+  } catch (error) {
+    document.getElementById('errorMessage').textContent = `Error initializing page: ${error.message}`;
+  }
+}
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>

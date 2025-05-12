@@ -1,0 +1,160 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: auto;
+  background: linear-gradient(135deg, #1a3c34 0%, #d97706 100%);
+  color: white;
+  font-family: 'Arial', sans-serif;
+  scroll-behavior: smooth;
+}
+
+/* Light theme */
+body.light {
+  background: linear-gradient(135deg, #f4f4f4 0%, #e0e0e0 100%);
+  color: #333;
+}
+body.light .content-section {
+  background: rgba(255, 255, 255, 0.85);
+  color: #333;
+}
+body.light .bus-card {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark theme */
+body.dark {
+  background: linear-gradient(135deg, #1a1a3d 0%, #333 100%);
+  color: #f4f4f4;
+}
+body.dark .content-section {
+  background: rgba(0, 0, 0, 0.85);
+}
+body.dark .bus-card {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navbar {
+  background: rgba(0, 0, 0, 0.7);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-brand {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #f59e0b !important;
+  text-transform: uppercase;
+}
+
+.nav-link {
+  color: white !important;
+  font-size: 1.1rem;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #f59e0b !important;
+  transform: translateY(-2px);
+}
+
+.content-section {
+  padding: 6rem 2rem;
+  background: rgba(0, 0, 0, 0.85);
+  min-height: 100vh;
+}
+
+.content-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.content-section h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+  background: linear-gradient(90deg, #f59e0b, #b91c1c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+}
+
+body.light .content-section h1 {
+  background: linear-gradient(90deg, #b91c1c, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#map {
+  height: 400px;
+  width: 100%;
+  margin: 2rem 0;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.bus-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bus-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.bus-card h3 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #f59e0b;
+}
+
+body.light .bus-card h3 {
+  color: #b91c1c;
+}
+
+.bus-card p {
+  font-size: 1.1rem;
+  margin: 0.25rem 0;
+}
+
+.status-on-route {
+  color: #00ff00;
+  font-weight: bold;
+}
+.status-departing-soon {
+  color: #ffa500;
+  font-weight: bold;
+}
+.status-at-depot {
+  color: #ff0000;
+  font-weight: bold;
+}
+.status-arrived {
+  color: #00aaff;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .content-section {
+    padding: 4rem 1rem;
+  }
+  .content-section h1 {
+    font-size: 2.5rem;
+  }
+  .bus-card h3 {
+    font-size: 1.5rem;
+  }
+  .bus-card p {
+    font-size: 1rem;
+  }
+}

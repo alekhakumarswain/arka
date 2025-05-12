@@ -6,14 +6,51 @@
   <title>Arka - Tourism</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    body { background: #1a1a3d; color: white; }
+    body { background: #1a1a3d; color: white; font-family: 'Arial', sans-serif; }
     .navbar { background: rgba(0, 0, 0, 0.6); }
     .navbar-brand { font-size: 1.8rem; font-weight: bold; color: #00aaff !important; }
     .nav-link { color: white !important; }
     .nav-link:hover { color: #00aaff !important; }
-    .card { background: rgba(255, 255, 255, 0.1); border: none; }
-    .btn { transition: transform 0.3s ease; }
-    .btn:hover { transform: scale(1.05); }
+    .container { padding-top: 5rem; padding-bottom: 2rem; }
+    .card { background: rgba(255, 255, 255, 0.1); border: none; border-radius: 15px; padding: 1rem; }
+    .btn-primary {
+      background: #00aaff;
+      border: none;
+      transition: transform 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: #0088cc;
+      transform: scale(1.05);
+    }
+    .btn-outline-light {
+      border-color: #00aaff;
+      color: #00aaff;
+      transition: transform 0.3s ease;
+    }
+    .btn-outline-light:hover {
+      background: #00aaff;
+      color: white;
+      transform: scale(1.05);
+    }
+    h1 { font-size: 2.5rem; color: #00aaff; }
+    h5 { font-size: 1.5rem; color: #00aaff; }
+    .modal-content { background: rgba(0, 0, 0, 0.8); color: white; border-radius: 15px; }
+    .modal-header, .modal-footer { border: none; }
+    .modal-title { color: #00aaff; }
+    .form-control {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+    }
+    .form-control:focus {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      box-shadow: none;
+      border-color: #00aaff;
+    }
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+    }
   </style>
 </head>
 <body>
@@ -31,6 +68,7 @@
           <li class="nav-item"><a class="nav-link" href="/pages/trekking.html">Trekking</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/events.html">Events</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/profile.html">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" id="authLink" href="/Auth.html">Login</a></li>
         </ul>
       </div>
     </div>
@@ -38,59 +76,220 @@
 
   <div class="container mt-5">
     <h1 class="text-center mb-4">Explore Tourism</h1>
+    <div class="row mb-4">
+      <div class="col-md-6 mb-2">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search by name...">
+      </div>
+      <div class="col-md-6 mb-2">
+        <select class="form-control" id="filterType">
+          <option value="">All Types</option>
+          <option value="Temple">Temple</option>
+          <option value="Beach">Beach</option>
+          <option value="Monument">Monument</option>
+        </select>
+      </div>
+    </div>
     <div class="row" id="tourism-container">
       <!-- Dynamic tourism site cards will be inserted here -->
     </div>
   </div>
 
+  <!-- Tourism Details Modal -->
+  <div class="modal fade" id="tourismModal" tabindex="-1" aria-labelledby="tourismModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tourismModalLabel"></h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Type:</strong> <span id="modalType"></span></p>
+          <p><strong>History:</strong> <span id="modalHistory"></span></p>
+          <p><strong>Entry Fee:</strong> <span id="modalEntryFee"></span></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Fetch tourism sites data from data.json and render tourism cards
-    fetch('../assets/json/data.json')
-      .then(response => response.json())
-      .then(data => {
-        const tourismSites = data.tourism_sites;
-        const tourismContainer = document.getElementById('tourism-container');
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+    import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { onAuthStateChange, signOutUser } from '/assets/js/services/auth.js';
 
-        for (const siteId in tourismSites) {
-          if (tourismSites.hasOwnProperty(siteId)) {
-            const site = tourismSites[siteId];
+    const firebaseConfig = {
+      apiKey: "AIzaSyDkYJtwm9mqrq2zFIIr0DXElYG44WIpswI",
+      authDomain: "arka-5258.firebaseapp.com",
+      databaseURL: "https://arka-5258-default-rtdb.firebaseio.com",
+      projectId: "arka-5258",
+      storageBucket: "arka-5258.firebasestorage.app",
+      messagingSenderId: "378365125891",
+      appId: "1:378365125891:web:43e9ca1df58152d9f8b536",
+      measurementId: "G-2V7TSEBWQ8"
+    };
 
-            const colDiv = document.createElement('div');
-            colDiv.className = 'col-md-4 mb-4';
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const firestore = getFirestore(app);
 
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card text-white p-3 h-100 d-flex flex-column justify-content-between';
+    let allTourismSites = [];
+    let currentUser = null;
 
-            const title = document.createElement('h5');
-            title.textContent = site.name;
-            cardDiv.appendChild(title);
-
-            const type = document.createElement('p');
-            type.textContent = `Type: ${site.type}`;
-            cardDiv.appendChild(type);
-
-            const description = document.createElement('p');
-            description.textContent = site.history.length > 100 ? site.history.substring(0, 100) + '...' : site.history;
-            cardDiv.appendChild(description);
-
-            const entryFee = document.createElement('p');
-            entryFee.textContent = `Entry Fee: ${site.entry_fee}`;
-            cardDiv.appendChild(entryFee);
-
-            const button = document.createElement('button');
-            button.className = 'btn btn-primary mt-auto';
-            button.textContent = 'Explore';
-            cardDiv.appendChild(button);
-
-            colDiv.appendChild(cardDiv);
-            tourismContainer.appendChild(colDiv);
+    // Handle authentication state changes for login/logout
+    const authLink = document.getElementById('authLink');
+    authLink.textContent = 'Loading...';
+    onAuthStateChange((user) => {
+      console.log('Auth state changed:', user ? 'Logged in' : 'Logged out', user);
+      currentUser = user;
+      if (user) {
+        authLink.textContent = 'Signout';
+        authLink.href = '#';
+        authLink.onclick = async () => {
+          try {
+            await signOutUser();
+            console.log('User signed out');
+            window.location.href = '/index.html';
+          } catch (error) {
+            console.error('Logout failed:', error);
           }
-        }
-      })
-      .catch(error => {
-        console.error('Error loading tourism data:', error);
+        };
+      } else {
+        authLink.textContent = 'Login';
+        authLink.href = '/Auth.html';
+        authLink.onclick = null;
+      }
+      renderTourismSites(); // Re-render to update "Save" button visibility
+    });
+
+    // Save tourism site to user's profile
+    async function saveTourismSite(siteId, site) {
+      if (!currentUser) {
+        alert('Please log in to save tourism sites.');
+        window.location.href = '/Auth.html';
+        return;
+      }
+      try {
+        const userDocRef = doc(firestore, 'users', currentUser.uid);
+        await setDoc(userDocRef, {
+          saved_places: {
+            [siteId]: {
+              name: site.name,
+              type: site.type,
+              history: site.history,
+              entry_fee: site.entry_fee
+            }
+          }
+        }, { merge: true });
+        alert(`${site.name} has been saved to your profile!`);
+      } catch (error) {
+        console.error('Error saving tourism site:', error);
+        alert('Failed to save the site. Please try again.');
+      }
+    }
+
+    // Show tourism site details in modal
+    function showTourismDetails(site) {
+      document.getElementById('tourismModalLabel').textContent = site.name;
+      document.getElementById('modalType').textContent = site.type;
+      document.getElementById('modalHistory').textContent = site.history;
+      document.getElementById('modalEntryFee').textContent = site.entry_fee;
+      const modal = new bootstrap.Modal(document.getElementById('tourismModal'));
+      modal.show();
+    }
+
+    // Render tourism sites
+    function renderTourismSites() {
+      const tourismContainer = document.getElementById('tourism-container');
+      tourismContainer.innerHTML = '';
+
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      const filterType = document.getElementById('filterType').value;
+
+      const filteredSites = allTourismSites.filter(site => {
+        const matchesSearch = site.name.toLowerCase().includes(searchQuery);
+        const matchesType = filterType ? site.type === filterType : true;
+        return matchesSearch && matchesType;
       });
+
+      if (filteredSites.length === 0) {
+        tourismContainer.innerHTML = '<p class="text-center">No tourism sites found.</p>';
+        return;
+      }
+
+      filteredSites.forEach((site, siteId) => {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-md-4 mb-4';
+
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card text-white h-100 d-flex flex-column';
+
+        const cardBody = document.createElement('div');
+        cardBody.className = 'p-3 flex-grow-1 d-flex flex-column';
+
+        const title = document.createElement('h5');
+        title.textContent = site.name;
+        cardBody.appendChild(title);
+
+        const type = document.createElement('p');
+        type.textContent = `Type: ${site.type}`;
+        cardBody.appendChild(type);
+
+        const description = document.createElement('p');
+        description.textContent = site.history.length > 100 ? site.history.substring(0, 100) + '...' : site.history;
+        cardBody.appendChild(description);
+
+        const entryFee = document.createElement('p');
+        entryFee.textContent = `Entry Fee: ${site.entry_fee}`;
+        cardBody.appendChild(entryFee);
+
+        const buttonGroup = document.createElement('div');
+        buttonGroup.className = 'mt-auto d-flex gap-2';
+
+        const exploreButton = document.createElement('button');
+        exploreButton.className = 'btn btn-primary flex-grow-1';
+        exploreButton.textContent = 'Explore';
+        exploreButton.onclick = () => showTourismDetails(site);
+        buttonGroup.appendChild(exploreButton);
+
+        if (currentUser) {
+          const saveButton = document.createElement('button');
+          saveButton.className = 'btn btn-outline-light';
+          saveButton.textContent = 'Save';
+          saveButton.onclick = () => saveTourismSite(siteId, site);
+          buttonGroup.appendChild(saveButton);
+        }
+
+        cardBody.appendChild(buttonGroup);
+        cardDiv.appendChild(cardBody);
+        colDiv.appendChild(cardDiv);
+        tourismContainer.appendChild(colDiv);
+      });
+    }
+
+    // Fetch tourism sites data from Firebase Realtime Database
+    function fetchTourismSites() {
+      const tourismRef = ref(database, 'tourism_sites');
+      onValue(tourismRef, (snapshot) => {
+        const tourismSites = snapshot.val() || {};
+        console.log('Tourism sites fetched:', tourismSites);
+        allTourismSites = Object.entries(tourismSites).map(([siteId, site]) => ({ ...site, siteId }));
+        renderTourismSites();
+      }, (error) => {
+        console.error('Error fetching tourism data:', error);
+        document.getElementById('tourism-container').innerHTML = '<p class="text-center text-danger">Error loading tourism data. Please try again later.</p>';
+      });
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchTourismSites();
+      document.getElementById('searchInput').addEventListener('input', renderTourismSites);
+      document.getElementById('filterType').addEventListener('change', renderTourismSites);
+    });
   </script>
 </body>
 </html>

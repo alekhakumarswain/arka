@@ -3,144 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arka - Authentication</title>
-  <!-- Bootstrap CSS (CDN) -->
+  <title>Arka - Login & Signup</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Animate.css (CDN) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: linear-gradient(135deg, #1a3c34 0%, #d97706 100%);
+    body {
+      background: linear-gradient(135deg, #1a1a3d 0%, #2a4066 100%);
       color: white;
       font-family: 'Arial', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
     .navbar {
-      background: rgba(0, 0, 0, 0.7);
-      position: fixed;
-      width: 100%;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      padding: 0.5rem 1rem;
+      background: rgba(0, 0, 0, 0.6);
     }
     .navbar-brand {
       font-size: 1.8rem;
       font-weight: bold;
-      color: #f59e0b !important;
-      text-transform: uppercase;
+      color: #00aaff !important;
     }
     .nav-link {
       color: white !important;
-      font-size: 1rem;
-      padding: 0.5rem 1rem;
-      transition: color 0.3s ease;
     }
     .nav-link:hover {
-      color: #f59e0b !important;
-    }
-    .navbar-nav {
-      gap: 0.5rem;
-    }
-    .navbar-collapse {
-      justify-content: flex-end;
+      color: #00aaff !important;
     }
     .auth-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      max-width: 400px;
+      margin: auto;
       padding: 2rem;
-    }
-    .auth-card {
-      background: rgba(0, 0, 0, 0.6);
-      padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      width: 100%;
-      max-width: 500px;
-    }
-    .auth-card h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      text-align: center;
-      color: #f59e0b;
-      margin-bottom: 1.5rem;
-    }
-    .nav-tabs .nav-link {
-      color: white !important;
       background: rgba(255, 255, 255, 0.1);
-      border: none;
-    }
-    .nav-tabs .nav-link.active {
-      color: #f59e0b !important;
-      background: rgba(0, 0, 0, 0.8);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      margin-top: 2rem;
     }
     .form-control {
       background: rgba(255, 255, 255, 0.1);
       border: none;
       color: white;
-      margin-bottom: 1rem;
     }
     .form-control:focus {
       background: rgba(255, 255, 255, 0.2);
       color: white;
       box-shadow: none;
-      border-color: #f59e0b;
+      border-color: #00aaff;
     }
     .btn-primary {
-      background: #f59e0b;
+      background: #00aaff;
       border: none;
       transition: transform 0.3s ease;
     }
     .btn-primary:hover {
-      background: #b91c1c;
       transform: scale(1.05);
+      background: #0088cc;
     }
-    .btn-google {
-      background: #ffffff;
-      color: #333;
-      border: 1px solid #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.3s ease;
-    }
-    .btn-google img {
-      width: 20px;
-      margin-right: 10px;
-    }
-    .btn-google:hover {
-      background: #f1f1f1;
-      transform: scale(1.05);
+    .btn-outline-light {
+      border-color: rgba(255, 255, 255, 0.5);
     }
     .error-message {
-      color: #b91c1c;
-      font-size: 0.9rem;
-      text-align: center;
-      margin-top: 0.5rem;
       display: none;
-    }
-    @media (max-width: 768px) {
-      .navbar-brand { font-size: 1.5rem; }
-      .nav-link { font-size: 0.9rem; padding: 0.5rem; }
-      .navbar-nav { text-align: center; }
-      .auth-card { padding: 1.5rem; }
-      .auth-card h2 { font-size: 1.5rem; }
+      color: #ff6b6b;
+      font-size: 0.9rem;
     }
     @media (max-width: 576px) {
-      .navbar { padding: 0.5rem; }
-      .navbar-brand { font-size: 1.3rem; }
-      .nav-link { font-size: 0.8rem; }
+      .auth-container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+      .navbar-brand {
+        font-size: 1.5rem;
+      }
+      .nav-link {
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
+    <div class="container">
       <a class="navbar-brand" href="/index.html">Arka</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -148,87 +91,119 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="/pages/bus-tracking.html">Bus Tracking</a></li>
+          <li class="nav-item"><a class="nav-link" href="/pages/booking.html">Book Tickets</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/tourism.html">Tourism</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/trekking.html">Trekking</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/events.html">Events</a></li>
           <li class="nav-item"><a class="nav-link" href="/pages/profile.html">Profile</a></li>
-          <li class="nav-item"><a class="nav-link" href="/pages/booking.html">Book Tickets</a></li>
-          <li class="nav-item"><a class="nav-link active" id="authLink" href="/Auth.html">Login</a></li>
+          <li class="nav-item"><a class="nav-link" id="authLink" href="/Auth.html">Login</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Authentication Section -->
   <div class="auth-container">
-    <div class="auth-card animate__animated animate__fadeIn">
-      <h2>Arka Authentication</h2>
-      <ul class="nav nav-tabs mb-3" id="authTabs" role="tablist">
-        <li class="nav-item">
-          <a class="nav-link active" id="login-tab" data-bs-toggle="tab" href="#login" role="tab">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="signup-tab" data-bs-toggle="tab" href="#signup" role="tab">Sign Up</a>
-        </li>
-      </ul>
-      <div class="tab-content">
-        <!-- Login Tab -->
-        <div class="tab-pane fade show active" id="login" role="tabpanel">
-          <div class="mb-3">
-            <input type="email" class="form-control" id="loginEmail" placeholder="Email" required>
-          </div>
-          <div class="mb-3">
-            <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
-          </div>
-          <button class="btn btn-primary w-100 mb-3" id="loginButton">Login</button>
-          <button class="btn btn-google w-100" id="googleLoginButton">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
-            Sign in with Google
-          </button>
-          <p class="error-message" id="loginError"></p>
-        </div>
-        <!-- Signup Tab -->
-        <div class="tab-pane fade" id="signup" role="tabpanel">
-          <div class="mb-3">
-            <input type="text" class="form-control" id="signupName" placeholder="Full Name" required>
-          </div>
-          <div class="mb-3">
-            <input type="email" class="form-control" id="signupEmail" placeholder="Email" required>
-          </div>
-          <div class="mb-3">
-            <input type="tel" class="form-control" id="signupPhone" placeholder="Phone Number" required>
-          </div>
-          <div class="mb-3">
-            <input type="password" class="form-control" id="signupPassword" placeholder="Password" required>
-          </div>
-          <button class="btn btn-primary w-100 mb-3" id="signupButton">Sign Up</button>
-          <button class="btn btn-google w-100" id="googleSignupButton">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
-            Sign up with Google
-          </button>
-          <p class="error-message" id="signupError"></p>
-        </div>
+    <h2 class="text-center mb-4">Login / Signup</h2>
+    <!-- Login Form -->
+    <div id="loginForm">
+      <h4 class="mb-3">Login</h4>
+      <div class="mb-3">
+        <input type="email" class="form-control" id="loginEmail" placeholder="Email" required>
       </div>
+      <div class="mb-3">
+        <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+      </div>
+      <div class="error-message mb-3" id="loginError"></div>
+      <button class="btn btn-primary w-100 mb-3" id="loginButton">Login</button>
+      <button class="btn btn-outline-light w-100 mb-3" id="googleLoginButton">
+        <i class="fab fa-google me-2"></i> Sign in with Google
+      </button>
+      <p class="text-center">
+        Don't have an account? <a href="#" id="showSignup">Sign Up</a>
+      </p>
+    </div>
+    <!-- Signup Form -->
+    <div id="signupForm" style="display: none;">
+      <h4 class="mb-3">Sign Up</h4>
+      <div class="mb-3">
+        <input type="text" class="form-control" id="signupName" placeholder="Full Name" required>
+      </div>
+      <div class="mb-3">
+        <input type="email" class="form-control" id="signupEmail" placeholder="Email" required>
+      </div>
+      <div class="mb-3">
+        <input type="tel" class="form-control" id="signupPhone" placeholder="Phone Number" required>
+      </div>
+      <div class="mb-3">
+        <input type="password" class="form-control" id="signupPassword" placeholder="Password" required>
+      </div>
+      <div class="error-message mb-3" id="signupError"></div>
+      <button class="btn btn-primary w-100 mb-3" id="signupButton">Sign Up</button>
+      <button class="btn btn-outline-light w-100 mb-3" id="googleSignupButton">
+        <i class="fab fa-google me-2"></i> Sign up with Google
+      </button>
+      <p class="text-center">
+        Already have an account? <a href="#" id="showLogin">Login</a>
+      </p>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script type="module" src="/assets/js/services/auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
-    import { loginWithEmail, signupWithEmail, signInWithGoogle, onAuthStateChange, signOutUser } from '/assets/js/services/auth.js';
+    import { loginWithEmail, signupWithEmail, signInWithGoogle, handleGoogleRedirectResult, onAuthStateChange, signOutUser } from '/assets/js/services/auth.js';
+
+    // Show loading state
+    function showLoading(button) {
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+    }
+
+    // Hide loading state
+    function hideLoading(button, originalText) {
+      button.disabled = false;
+      button.innerHTML = originalText;
+    }
+
+    // Validate email format
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
 
     // Login function
     async function login() {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
       const errorElement = document.getElementById('loginError');
+      const loginButton = document.getElementById('loginButton');
+      const originalText = loginButton.innerHTML;
+
+      errorElement.style.display = 'none';
+      if (!isValidEmail(email)) {
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Please enter a valid email address.';
+        return;
+      }
+      if (!password) {
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Please enter a password.';
+        return;
+      }
+
+      showLoading(loginButton);
       try {
         await loginWithEmail(email, password);
-        window.location.href = './pages/profile.html';
+        await new Promise(resolve => {
+          onAuthStateChange(user => {
+            if (user) resolve();
+          });
+        });
+        window.location.href = '/pages/profile.html';
       } catch (error) {
         errorElement.style.display = 'block';
         errorElement.textContent = error.message;
+      } finally {
+        hideLoading(loginButton, originalText);
       }
     }
 
@@ -239,48 +214,96 @@
       const phone = document.getElementById('signupPhone').value;
       const password = document.getElementById('signupPassword').value;
       const errorElement = document.getElementById('signupError');
+      const signupButton = document.getElementById('signupButton');
+      const originalText = signupButton.innerHTML;
+
+      errorElement.style.display = 'none';
+      if (!name) {
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Please enter your full name.';
+        return;
+      }
+      if (!isValidEmail(email)) {
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Please enter a valid email address.';
+        return;
+      }
+      if (!phone) {
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Please enter your phone number.';
+        return;
+      }
+      if (password.length < 6) {
+        errorElement.style.display = 'block';
+        errorElement.textContent = 'Password must be at least 6 characters long.';
+        return;
+      }
+
+      showLoading(signupButton);
       try {
         await signupWithEmail(name, email, phone, password);
-        window.location.href = './pages/profile.html';
+        await new Promise(resolve => {
+          onAuthStateChange(user => {
+            if (user) resolve();
+          });
+        });
+        window.location.href = '/pages/profile.html';
       } catch (error) {
+        errorElement.style.display = 'block';
+        errorElement.textContent = error.message;
+      } finally {
+        hideLoading(signupButton, originalText);
+      }
+    }
+
+    // Google Sign-in/Sign-up
+    async function handleGoogleAuth(errorElementId, buttonId) {
+      const errorElement = document.getElementById(errorElementId);
+      const button = document.getElementById(buttonId);
+      const originalText = button.innerHTML;
+
+      errorElement.style.display = 'none';
+      showLoading(button);
+      try {
+        await signInWithGoogle();
+      } catch (error) {
+        errorElement.style.display = 'block';
+        errorElement.textContent = error.message;
+        hideLoading(button, originalText);
+      }
+    }
+
+    // Handle Google redirect result
+    async function checkGoogleRedirect() {
+      try {
+        const user = await handleGoogleRedirectResult();
+        if (user) {
+          await new Promise(resolve => {
+            onAuthStateChange(user => {
+              if (user) resolve();
+            });
+          });
+          window.location.href = '/pages/profile.html';
+        }
+      } catch (error) {
+        const errorElement = document.getElementById('signupError') || document.getElementById('loginError');
         errorElement.style.display = 'block';
         errorElement.textContent = error.message;
       }
     }
 
-    // Attach event listeners
-    document.getElementById('loginButton').addEventListener('click', login);
-    document.getElementById('signupButton').addEventListener('click', signup);
-    document.getElementById('googleLoginButton').addEventListener('click', async () => {
-      const errorElement = document.getElementById('loginError');
-      try {
-        await signInWithGoogle();
-        window.location.href = '/pages/profile.html';
-      } catch (error) {
-        errorElement.style.display = 'block';
-        errorElement.textContent = error.message;
-      }
-    });
-    document.getElementById('googleSignupButton').addEventListener('click', async () => {
-      const errorElement = document.getElementById('signupError');
-      try {
-        await signInWithGoogle();
-        window.location.href = '/pages/profile.html';
-      } catch (error) {
-        errorElement.style.display = 'block';
-        errorElement.textContent = error.message;
-      }
-    });
-
-    // Update navbar based on auth state
+    // Update navbar
+    const authLink = document.getElementById('authLink');
+    authLink.textContent = 'Loading...';
     onAuthStateChange((user) => {
-      const authLink = document.getElementById('authLink');
+      console.log('Auth state changed in Auth.html:', user ? 'Logged in' : 'Logged out', user);
       if (user) {
-        authLink.textContent = 'Logout';
+        authLink.textContent = 'Signout';
         authLink.href = '#';
         authLink.onclick = async () => {
           try {
             await signOutUser();
+            console.log('User signed out');
             window.location.href = '/index.html';
           } catch (error) {
             console.error('Logout failed:', error);
@@ -292,6 +315,25 @@
         authLink.onclick = null;
       }
     });
+
+    // Toggle forms
+    document.getElementById('showSignup').addEventListener('click', () => {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('signupForm').style.display = 'block';
+    });
+
+    document.getElementById('showLogin').addEventListener('click', () => {
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('signupForm').style.display = 'none';
+    });
+
+    // Event listeners
+    document.getElementById('loginButton').addEventListener('click', login);
+    document.getElementById('signupButton').addEventListener('click', signup);
+    document.getElementById('googleLoginButton').addEventListener('click', () => handleGoogleAuth('loginError', 'googleLoginButton'));
+    document.getElementById('googleSignupButton').addEventListener('click', () => handleGoogleAuth('signupError', 'googleSignupButton'));
+
+    window.addEventListener('load', checkGoogleRedirect);
   </script>
 </body>
 </html>

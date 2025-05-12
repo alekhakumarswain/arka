@@ -1,66 +1,43 @@
 import { db } from './firebase-config.js';
-import { doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+import { doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 // Get user profile
-export async function getUserProfile(userId) {
+async function getUserProfile(uid) {
   try {
-    const userDoc = await getDoc(doc(db, 'arka_users', userId));
-    return userDoc.exists() ? userDoc.data() : null;
+    const userDoc = await getDoc(doc(db, 'users', uid));
+    if (userDoc.exists()) {
+      return userDoc.data();
+    }
+    return null;
   } catch (error) {
-    throw new Error(error.message);
+    console.error('Get User Profile Error:', error);
+    throw new Error('Failed to fetch user profile: ' + error.message);
   }
 }
 
 // Update user profile
-export async function updateUserProfile(userId, data) {
+async function updateUserProfile(uid, data) {
   try {
-    await updateDoc(doc(db, 'arka_users', userId), data);
+    await setDoc(doc(db, 'users', uid), data, { merge: true });
   } catch (error) {
-    throw new Error(error.message);
-  }
-}
-
-// Add a booking
-export async function addBooking(userId, bookingData) {
-  try {
-    const bookingRef = await addDoc(collection(db, 'arka', 'bookings'), {
-      userId,
-      ...bookingData,
-      created_at: new Date()
-    });
-    return bookingRef.id;
-  } catch (error) {
-    throw new Error(error.message);
+    console.error('Update User Profile Error:', error);
+    throw new Error('Failed to update user profile: ' + error.message);
   }
 }
 
 // Get user bookings
-export async function getUserBookings(userId) {
+async function getUserBookings(uid) {
   try {
-    const q = query(collection(db, 'arka', 'bookings'), where('userId', '==', userId));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const bookingsSnapshot = await getDocs(collection(db, `users/${uid}/bookings`));
+    const bookings = [];
+    bookingsSnapshot.forEach(doc => {
+      bookings.push({ id: doc.id, ...doc.data() });
+    });
+    return bookings;
   } catch (error) {
-    throw new Error(error.message);
+    console.error('Get User Bookings Error:', error);
+    throw new Error('Failed to fetch bookings: ' + error.message);
   }
 }
 
-// Get bus details
-export async function getBusDetails(busId) {
-  try {
-    const busDoc = await getDoc(doc(db, 'arka', 'buses', busId));
-    return busDoc.exists() ? busDoc.data() : null;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-}
-
-// Get route details
-export async function getRouteDetails(routeId) {
-  try {
-    const routeDoc = await getDoc(doc(db, 'arka', 'routes', routeId));
-    return routeDoc.exists() ? routeDoc.data() : null;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-}
+export { getUserProfile, updateUserProfile, getUserBookings };
