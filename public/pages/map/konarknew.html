@@ -94,7 +94,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Scene Setup
+    // Scene Setup (unchanged)
     const container = document.getElementById('map-container');
     const loadingElement = document.getElementById('loading');
     const scene = new THREE.Scene();
@@ -105,7 +105,7 @@
     renderer.shadowMap.enabled = true;
     container.appendChild(renderer.domElement);
 
-    // Check WebGL support
+    // Check WebGL support (unchanged)
     if (!renderer.getContext()) {
       loadingElement.textContent = 'WebGL is not supported in your browser. Please try a modern browser.';
       console.error('WebGL is not supported in this browser.');
@@ -113,7 +113,7 @@
       console.log('WebGL is supported.');
     }
 
-    // Skybox
+    // Skybox (unchanged)
     const textureLoader = new THREE.TextureLoader();
     let skyTexture = null;
     let backgroundRotation = 0;
@@ -134,7 +134,7 @@
       }
     );
 
-    // Orbit Controls
+    // Orbit Controls (unchanged)
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
@@ -142,7 +142,7 @@
     controls.maxDistance = 100;
     controls.maxPolarAngle = Math.PI / 2;
 
-    // Lighting
+    // Lighting (unchanged)
     scene.add(new THREE.AmbientLight(0xffffff, 0.5));
     
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -152,14 +152,13 @@
     directionalLight.shadow.mapSize.height = 1024;
     scene.add(directionalLight);
 
-    // Hemisphere light for more natural outdoor lighting
     const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
     scene.add(hemisphereLight);
 
-    // Terrain
+    // Terrain (change color to grass)
     const terrainGeometry = new THREE.PlaneGeometry(200, 200, 100, 100);
     const terrainMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x85a0d5,
+      color: 0x4CAF50, // Changed to grass green color
       roughness: 0.8,
       metalness: 0.2
     });
@@ -169,7 +168,7 @@
     terrain.receiveShadow = true;
     scene.add(terrain);
 
-    // Add some random hills
+    // Add some random hills (unchanged)
     const vertices = terrainGeometry.attributes.position.array;
     for (let i = 0; i < vertices.length; i += 3) {
       const x = vertices[i];
@@ -182,25 +181,14 @@
     terrainGeometry.attributes.position.needsUpdate = true;
     terrainGeometry.computeVertexNormals();
 
-    // Platform for the temple
-    const platformGeometry = new THREE.CylinderGeometry(15, 15, 0.5, 32);
-    const platformMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xdddddd,
-      roughness: 0.7,
-      metalness: 0.3
-    });
-    const platform = new THREE.Mesh(platformGeometry, platformMaterial);
-    platform.position.set(0, 0, 0);
-    platform.rotation.x = Math.PI / 2;
-    platform.receiveShadow = true;
-    scene.add(platform);
+    // Removed the platform (white circle) - no need for this section anymore
 
-    // Landmarks
-    const landmarks = [{ name: "Konark Sun Temple", x: 0, z: 0 }];
+    // Landmarks (unchanged)
+    const landmarks = [{ name: "Konark Sun Temple", x: -10, z: 0 }];
     const landmarkMeshes = [];
     const gltfLoader = new THREE.GLTFLoader();
 
-    // Load the Konark Sun Temple model
+    // Load the Konark Sun Temple model (raise the temple)
     gltfLoader.load(
       '../../assets/models/temples/konark.glb',
       (gltf) => {
@@ -213,18 +201,18 @@
         
         model.position.set(
           landmarks[0].x - center.x,
-          -center.y + size.y/2, // Place on top of platform
+          -center.y + size.y/2 + 2, // Raised by 2 units (adjust as needed)
           landmarks[0].z - center.z
         );
         
-        // Scale the model
+        // Scale the model (unchanged)
         const scale = 10;
         model.scale.set(scale, scale, scale);
         
-        // Rotate to face forward
+        // Rotate to face forward (unchanged)
         model.rotation.y = Math.PI;
         
-        // Enable shadows
+        // Enable shadows (unchanged)
         model.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
@@ -240,10 +228,10 @@
         scene.add(model);
         landmarkMeshes.push(model);
         
-        // Hide loading indicator
+        // Hide loading indicator (unchanged)
         loadingElement.style.display = 'none';
         
-        // Set camera position to view the temple
+        // Set camera position to view the temple (unchanged)
         camera.position.set(20, 15, 30);
         controls.target.copy(model.position);
       },
@@ -255,25 +243,25 @@
         console.error('Error loading temple model:', error);
         loadingElement.textContent = 'Failed to load temple model. Showing placeholder.';
         
-        // Fallback placeholder
+        // Fallback placeholder (raise the placeholder as well)
         const placeholder = new THREE.Mesh(
           new THREE.BoxGeometry(5, 5, 5),
           new THREE.MeshStandardMaterial({ color: 0x808080 })
         );
-        placeholder.position.set(landmarks[0].x, 2.5, landmarks[0].z);
+        placeholder.position.set(landmarks[0].x, 4.5, landmarks[0].z); // Raised by 2 units (2.5 + 2)
         placeholder.castShadow = true;
         placeholder.receiveShadow = true;
         placeholder.userData = { name: landmarks[0].name };
         scene.add(placeholder);
         landmarkMeshes.push(placeholder);
         
-        // Set camera position to view the placeholder
+        // Set camera position to view the placeholder (unchanged)
         camera.position.set(20, 15, 30);
         controls.target.copy(placeholder.position);
       }
     );
 
-    // Tooltip
+    // Tooltip (unchanged)
     const tooltip = document.getElementById('tooltip');
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -323,7 +311,7 @@
       }
     });
 
-    // Animation loop
+    // Animation loop (unchanged)
     function animate() {
       requestAnimationFrame(animate);
       
@@ -338,7 +326,7 @@
     }
     animate();
 
-    // Handle window resize
+    // Handle window resize (unchanged)
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();

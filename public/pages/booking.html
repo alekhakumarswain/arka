@@ -217,7 +217,22 @@
       color: var(--dark);
       font-weight: 600;
     }
+    .seat-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
 
+.seat-row .aisle {
+  width: 40px;
+  height: 45px;
+  margin: 8px;
+}
+
+.seat-row.last-row {
+  justify-content: flex-start;
+}
     .seat.available { background: #28a745; }
     .seat.selected { background: var(--primary); }
     .seat.occupied { background: #b91c1c; cursor: not-allowed; }
